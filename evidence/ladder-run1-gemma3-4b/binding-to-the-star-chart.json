@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "binding-to-the-star-chart",
+ "title": "Binding To The Star Chart",
+ "source": "6196124c5dae4e84",
+ "sourceWords": 269,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:28.191Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The lattice canon fixes a seam. A disclosure receipt projects an address, bitmask, and proof root. The instrument draws the receipt, limiting its view to the untrusted peer. The chart renders pages as stars and links as edges. A release connects cores, signed by both parties at a tier. A receipt without a countersignature does not draw. The gate displays this failing. The reflection operator has two fixed points: release nothing, or release only an address.",
+   "words": 76,
+   "address": "sha256:893655393f86b3941edad9f1be9758f0",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "The identity of an object is defined by its external characteristics, including axis configurations and a cryptographic proof. A release is defined by the engagement of specific axes and a corresponding countersignature.",
+   "words": 32,
+   "address": "sha256:458b5ca1cd7e6e6cd2a2b6772d8f2fff",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling asserts identity is defined by external characteristics, while the source states integration binds to a hash, bitmask, and proof root – *not* the interior."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "A one-way map connects a predicate over a set, with a related set. A disclosure receipt projects through a seam, exposing a bitmask and proof root. A release defines axes engaged, with two fixed points. The lattice canon fixes a cross-system seam, and a second kind of edge is a release.",
+   "words": 51,
+   "address": "sha256:3e1c8a74988b7ae19e512df5c831acf0",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The lattice canon fixes a cross-system seam."
+   }
+  }
+ }
+}

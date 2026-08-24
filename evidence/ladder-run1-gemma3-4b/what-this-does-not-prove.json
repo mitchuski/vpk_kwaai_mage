@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "what-this-does-not-prove",
+ "title": "What This Does Not Prove",
+ "source": "7a03f049edc04092",
+ "sourceWords": 240,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:27.466Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The maintainer doubts inference findings until confirmed on live nodes. \n\nThe usefulness of an answer is the determining factor for user adoption. The initial measurement was about length, not usefulness. \n\nAn illegal-instruction prediction originates from the instruction set, not a Raspberry Pi 4 crash. \n\nMinimization does not guarantee bounded leaks. \n\nThe private-network case is a testbed, not evidence of an inference mesh. Correlation can be reconstructed after receipt.",
+   "words": 68,
+   "address": "sha256:bbf66448ff87efba0cc70aa559bd220a",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Doubt remains regarding observed findings until verified across independent sources. Utility is determined by answer quality, not initial measurement. Leakage is bounded, not a guarantee of security. Authentication and limited volume establish a test environment, not conclusive evidence.",
+   "words": 38,
+   "address": "sha256:d61a2e42381b03bc88666fd8fd1ceed3",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling asserts findings are doubted until verified, while the source states doubt is entitled *until* verification."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Two open claims. A one-way map between source and inference findings. A predicate over a set of nodes. A measurement of length, not usefulness. A bounded leak, weaker than encryption. A counterparty authenticated before byte transmission. Correlation, unsolved.",
+   "words": 38,
+   "address": "sha256:7263df77a74118b1ab8ee5d3ff8f56fc",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The wire has been watched."
+   }
+  }
+ }
+}

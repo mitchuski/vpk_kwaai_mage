@@ -1,0 +1,37 @@
+  ✓ kwaai/binding-to-the-star-chart D1
+  ✗ kwaai/binding-to-the-star-chart D2 — The telling asserts identity is defined by external characteristics, while the source states integration binds to a hash, bitmask, and proof root – *not* the interior.
+  ✗ kwaai/binding-to-the-star-chart D3 — The lattice canon fixes a cross-system seam.
+  ✓ kwaai/how-to-check-this D1
+  ✓ kwaai/how-to-check-this D2
+  ✗ kwaai/how-to-check-this D3 — Claims are a one-way map (telling) vs. claims are derived (source).
+  ✗ kwaai/semantic-minimization D1 — Homomorphic inference is deployable.
+  ✗ kwaai/semantic-minimization D2 — Homomorphic inference is deployable.
+  ✗ kwaai/semantic-minimization D3 — The telling implies a one-way map is established, while the source states documents are sent (and returned, implicitly).
+  ✓ kwaai/the-address D1
+  ✗ kwaai/the-address D2 — The telling implies the telling *is* a fork, whereas the source explicitly states it is not.
+  ✗ kwaai/the-address D3 — The telling implies a one-way relationship where the source emphasizes collaboration and open contribution.
+  ✗ kwaai/the-disclosure-ladder D1 — D1 initiates a request (source states tiers are assigned by trust graph position, not request).
+  ✗ kwaai/the-disclosure-ladder D2 — The telling asserts progression, while the source states tier assignment is not by request.
+  ✗ kwaai/the-disclosure-ladder D3 — Longer tellings are discarded (source says longer tellings were initially present, then discarded).
+  ✓ kwaai/the-inference-seam D1
+  ✗ kwaai/the-inference-seam D2 — The telling implies all inference relies on one peer, while the source states peers 2..N see hidden states.
+  ✗ kwaai/the-inference-seam D3 — Three parties involved (source specifies a chain, implying more than two peers, but not necessarily three).
+  ✗ kwaai/the-pi-is-bob D1 — Inference was deemed unsuitable.
+  ✗ kwaai/the-pi-is-bob D2 — Inference is unsuitable.
+  ✗ kwaai/the-receipt D1 — The telling implies a fork *is* a working countersignature, while the source states it's *already* a working countersignature.
+  ✗ kwaai/the-receipt D2 — The telling asserts independent verification, while the source states verification occurs within a function, not independently.
+  ✗ kwaai/the-receipt D3 — Audit logs assert event, not intent.
+  ✗ kwaai/two-trust-ladders D1 — credential trust graph touches peer selection.
+  ✗ kwaai/two-trust-ladders D2 — Credential trust graph touches peer selection.
+  ✗ kwaai/two-trust-ladders D3 — Credential trust graph touches peer selection.
+  ✓ kwaai/welcome-visitors D1
+  ✓ kwaai/welcome-visitors D2
+  ✗ kwaai/welcome-visitors D3 — The telling asserts a one-way map, while the source describes a contribution *to* KwaaiNet and the Foundation, implying a two-way relationship.
+  ✗ kwaai/what-the-store-holds D1 — Vectors are held as encrypted, when the source states they are encrypted only in transit.
+  ✗ kwaai/what-the-store-holds D2 — Vectors are protected at rest.
+  ✓ kwaai/what-the-store-holds D3
+  ✓ kwaai/what-this-does-not-prove D1
+  ✗ kwaai/what-this-does-not-prove D2 — The telling asserts findings are doubted until verified, while the source states doubt is entitled *until* verification.
+  ✗ kwaai/what-this-does-not-prove D3 — The wire has been watched.
+
+  35 tellings checked by gemma3:12b · 26 contradict their source · 0 unverifiable

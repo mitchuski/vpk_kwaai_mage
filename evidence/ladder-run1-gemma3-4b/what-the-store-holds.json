@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "what-the-store-holds",
+ "title": "What The Store Holds",
+ "source": "828bdc8d105fe015",
+ "sourceWords": 124,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:21.999Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The applicant searches storage crates for encrypted vectors. The registry confirms vectors are held as storage hosts. The gate notes the whitepaper’s PHE integration replacing transport-only encryption. Connecting a knowledge base to a remote storage peer ships protected embeddings. Embedding inversion is a live literature.",
+   "words": 45,
+   "address": "sha256:1767686006a3e6b8ce87390b55b68c72",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Vectors are held as encrypted, when the source states they are encrypted only in transit."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Vectors are encrypted and held within storage crates, protected in transit and at rest. Integration replaces transport-only encryption, utilizing embeddings as a corpus for inversion.",
+   "words": 25,
+   "address": "sha256:fc2da0d5184249ace8428d3a57c2383e",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Vectors are protected at rest."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Node-Eve relation: holds encrypted vectors. RAG and CLI paths relate to vector search. PHE integration replaces transport encryption. Knowledge base connects to storage peer. Embedding inversion is a live literature.",
+   "words": 30,
+   "address": "sha256:d1229efcf5bab00eb9a684a87342256e",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  }
+ }
+}

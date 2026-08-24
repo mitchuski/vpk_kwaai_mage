@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "welcome-visitors",
+ "title": "Welcome Visitors",
+ "source": "5cd8962672697d5a",
+ "sourceWords": 171,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:17.104Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The applicant initiates a visit. The applicant consults the Inference Seam. The applicant explores Semantic Minimization. The applicant reviews The Address. The applicant reads What This Does Not Prove. The applicant examines Two Trust Ladders, What The Store Holds, The Pi Is Bob, and How To Check This. The applicant consults The Disclosure Ladder, The Receipt, and Binding To The Star Chart.",
+   "words": 62,
+   "address": "sha256:d48ba93181502490ecffc578e805d4bb",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Data storage and inference operate independently, with the host solely providing indexed ciphertext without document access.  The lane’s purpose centers on open inference, supported by a system of verifiable records and divergent perspectives.",
+   "words": 33,
+   "address": "sha256:1683b3ce0e54e9df272c401195a06f3b",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "A one-way map connects three parties: KwaaiNet, the Kwaai Foundation, and the agentprivacy universe. A predicate over a set defines a lane with cardinalities of one and two. Quantities are specified as “ranked indices” and “ciphertext”.",
+   "words": 36,
+   "address": "sha256:414658ef617ff77866523d4f11df0123",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling asserts a one-way map, while the source describes a contribution *to* KwaaiNet and the Foundation, implying a two-way relationship."
+   }
+  }
+ }
+}

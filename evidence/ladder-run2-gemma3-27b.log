@@ -1,0 +1,17 @@
+laddering 12 pages with gemma3:27b (resumable — re-runs skip what has not changed)
+
+  · kwaai/binding-to-the-star-chart                  269w → D1 61w · D2 40w · D3 32w   ratio 0.149
+  · kwaai/how-to-check-this                          159w → D1 55w · D2 38w · D3 26w   ratio 0.239
+  · kwaai/semantic-minimization                      199w → D1 59w · D2 42w · D3 28w   ratio 0.211
+  · kwaai/the-address                                258w → D1 45w · D2 39w · D3 27w   ratio 0.151
+  · kwaai/the-disclosure-ladder                      244w → D1 67w · D2 39w · D3 29w   ratio 0.160
+  · kwaai/the-inference-seam                         209w → D1 70w · D2 44w · D3 25w   ratio 0.211
+  · kwaai/the-pi-is-bob                              239w → D1 91w · D2 45w · D3 34w   ratio 0.188
+  · kwaai/the-receipt                                238w → D1 51w · D2 41w · D3 26w   ratio 0.172
+  · kwaai/two-trust-ladders                          206w → D1 64w · D2 46w · D3 35w   ratio 0.223
+  · kwaai/welcome-visitors                           171w → D1 69w · D2 32w · D3 22w   ratio 0.187
+  · kwaai/what-the-store-holds                       124w → D1 46w · D2 40w · D3 19w   ratio 0.323
+  · kwaai/what-this-does-not-prove                   240w → D1 60w · D2 46w · D3 51w   ratio 0.192
+
+✓ 12 pages written · 36 tellings generated · 0 already current
+  → ~/.wiki\.vpk\ladder

@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "semantic-minimization",
+ "title": "Semantic Minimization",
+ "source": "38afed4ad8dee3b3",
+ "sourceWords": 199,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:38.516Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "Send a compressed re-expression. \nThe data owner signs the release. \nThe receiving peer verifies the standing in the trust graph. \nThe document remains unchanged. \nThe counterparty receives a telling with chosen fidelity. \nMathematics establishes the invariant core. \nMinimization proves the released content. \nContracts define intent and purpose limitation.",
+   "words": 48,
+   "address": "sha256:bf2025948e4cb301cd3a1fafaabcdc9d",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Homomorphic inference is deployable."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Content-addressed compressions, representing data’s core, are permitted. Harm is limited by the agreed-upon fidelity, verified through trust relationships. Proof of release establishes the scope of disclosure, ensuring accountability.",
+   "words": 28,
+   "address": "sha256:b0d19ec4a101ad796a5d06522fd3d178",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Homomorphic inference is deployable."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Three parties establish a one-way map. A predicate over a set defines a compressed re-expression. Cardinality is one-to-one. Quantities are defined by fidelity and trust graph standing. VPK’s substrate is a constant.",
+   "words": 32,
+   "address": "sha256:9339cf41ab9922c0cdba43bd760e958a",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling implies a one-way map is established, while the source states documents are sent (and returned, implicitly)."
+   }
+  }
+ }
+}

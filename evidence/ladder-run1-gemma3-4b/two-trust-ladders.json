@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "two-trust-ladders",
+ "title": "Two Trust Ladders",
+ "source": "acb3e9cdbd5302d8",
+ "sourceWords": 206,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:11.538Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The system utilizes two trust scores. The first, credential-derived, assesses verifiable credentials. The second, behaviour-derived, measures peer performance. Chain selection prioritizes the behaviour-derived score. Peer entries are enriched from a reputation store. Candidates are filtered based on block coverage and failed peers, with trust serving as a secondary sort. A peer with no credentials can rank first if it exhibits good uptime.",
+   "words": 62,
+   "address": "sha256:83976ae52f49e0955736f64608c318a2",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "credential trust graph touches peer selection."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Trust is determined by performance metrics, specifically availability, throughput, and latency, alongside a vocabulary of tiers. Chain selection prioritizes behaviour-derived trust, while credential-derived trust is used solely as a secondary sorting factor.",
+   "words": 32,
+   "address": "sha256:d953a6d6a1113ec9609fddf054ec58a6",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Credential trust graph touches peer selection."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Two trust scores. One: credential-derived, a one-way map with cardinalities. The other: behaviour-derived, a one-way map with cardinalities. Chain selection uses the second. Peer entries enriched. Trust enters as a secondary sort.",
+   "words": 32,
+   "address": "sha256:85aadfaec7fd40a9fbf0fa57bc0a8f8c",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Credential trust graph touches peer selection."
+   }
+  }
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "the-address",
+ "title": "The Address",
+ "source": "72f03b576cf4d6ff",
+ "sourceWords": 258,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:43.853Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The Agentprivacy universe contributed a lane to KwaaiNet and the Virtual Private Knowledge protocol. A machine failed to run an inference node, prompting investigation. The team identified a seam in the code’s text and documentation. They state that claims are re-runnable commands and unobserved elements are labeled. The team clarified that minimization is not a guarantee, relying on VPK’s mathematics. The team released its own research corpus through the lane. A fork of the research is considered a receipt, performed by the receiver.",
+   "words": 83,
+   "address": "sha256:087a92afa3cbe02a6e7892e8e6487c32",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Truth resides in honest inquiry, acknowledging potential error and prioritizing verifiable foundations. Mathematical substrate remains paramount, alongside a supplementary layer built upon existing knowledge. Verification through independent reproduction establishes provenance and validates contributions.",
+   "words": 33,
+   "address": "sha256:d636578ff5d5967c615d6bf39da90909",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling implies the telling *is* a fork, whereas the source explicitly states it is not."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Three parties. A predicate over a set. A one-way map. A one-to-one relationship. A one-way map. A one-way map. A one-way map. A one-way map.",
+   "words": 25,
+   "address": "sha256:c1b4d110c1f0f0119184e869394e3523",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling implies a one-way relationship where the source emphasizes collaboration and open contribution."
+   }
+  }
+ }
+}

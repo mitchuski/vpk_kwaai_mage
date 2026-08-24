@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "the-receipt",
+ "title": "The Receipt",
+ "source": "82cfc09e6c755185",
+ "sourceWords": 238,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:06.442Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The DisclosureReceipt process begins with a record per release, detailing the address, tier, counterparty, admission basis, and validity window. Both parties must sign this record, or it is invalid. Signatures are verified in the recording function. Reciprocity is enforced, requiring the receiver’s countersignature for a release. Both namespaces advance one epoch. Delegation depth decreases on re-disclosure. A fork, created by the receiving side, serves as a working countersignature.",
+   "words": 68,
+   "address": "sha256:8966894f9dfa849f454e1310dc1f1abc",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling implies a fork *is* a working countersignature, while the source states it's *already* a working countersignature."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Verification of reciprocal countersignatures is required. A release is only valid when confirmed by both parties. The history of access must be independently verifiable.",
+   "words": 24,
+   "address": "sha256:3ecf374e5dc5011f49c337a13436143e",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling asserts independent verification, while the source states verification occurs within a function, not independently."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "DisclosureReceipt: two parties, signed record; audit log: one party, intent; one-way map: release to counterparty; function: verifies signatures; bilateral minting: shared surface; fork: provenance.",
+   "words": 24,
+   "address": "sha256:5927d39ed1399002df7e3aee60f85af9",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Audit logs assert event, not intent."
+   }
+  }
+ }
+}

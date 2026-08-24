@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "the-disclosure-ladder",
+ "title": "The Disclosure Ladder",
+ "source": "a3b265cd7af6c60c",
+ "sourceWords": 244,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:48.855Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "D1 ACTIONS initiates a request.\nD2 PRINCIPLES governs the process.\nD3 MATHS defines the structural relationships.\nD4 ADDRESS provides an address and a score.\nThe request is refused if the tier is not reached.\nA D1 telling exceeds its source by 1.44 times.\nThe guard discards the excessive telling.",
+   "words": 50,
+   "address": "sha256:bc276d5bfe7c3da0c38d9eb4780e6cb0",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "D1 initiates a request (source states tiers are assigned by trust graph position, not request)."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "The governing rule dictates a structure of abstraction, progressing from raw data to a governing rule, then to mathematical relationships, and finally to an address with a score.",
+   "words": 28,
+   "address": "sha256:1aad231a44a533cc86464f88a67c3326",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling asserts progression, while the source states tier assignment is not by request."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Five tiers exist. A one-way map connects them. D0 crosses to nobody. D1 reduces entities to roles. D2 defines a rule. D3 contains relations, types, and quantities. D4 is an address and a score. Refusal occurs for unreached tiers. A longer telling is discarded.",
+   "words": 44,
+   "address": "sha256:6ad9e901184db330c445210598aa55b0",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Longer tellings are discarded (source says longer tellings were initially present, then discarded)."
+   }
+  }
+ }
+}

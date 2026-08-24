@@ -1,0 +1,38 @@
+  ✗ kwaai/binding-to-the-star-chart D1 — A receipt without a countersignature draws.
+  ✗ kwaai/binding-to-the-star-chart D2 — The telling asserts releases require signature, while the source states a receipt without a countersignature does not draw.
+  ✗ kwaai/binding-to-the-star-chart D3 — The telling asserts a descending sequence clears bits, while the source states one step clears two bits where others clear one.
+  ✓ kwaai/how-to-check-this D1
+  ✓ kwaai/how-to-check-this D2
+  ✗ kwaai/how-to-check-this D3 — Claims have quantity one.
+  ✗ kwaai/semantic-minimization D1 — The applicant sends the telling, implying the document leaves.
+  ✓ kwaai/semantic-minimization D2
+  ✗ kwaai/semantic-minimization D3 — The telling asserts a one-way map, while the source states the telling is signed by both parties.
+  ✓ kwaai/the-address D1
+  ✗ kwaai/the-address D2 — The telling implies a fork *requires* acknowledgement, while the source states it *is* a receipt.
+  ✗ kwaai/the-address D3 — The telling implies the lane is a competing design, contradicting the source's statement that it is not.
+  ✗ kwaai/the-disclosure-ladder D1 — The registry fills requests with lower tiers.
+  ✗ kwaai/the-disclosure-ladder D2 — Longer tellings are rejected.
+  ✗ kwaai/the-disclosure-ladder D3 — A tier outputs a value, contradicting the source's statement that requests for unreached tiers are refused.
+  ✗ kwaai/the-inference-seam D1 — The telling asserts the "gate" downloads the embedding table, while the source states only the "first node" (not a "gate") does.
+  ✓ kwaai/the-inference-seam D2
+  ✓ kwaai/the-inference-seam D3
+  ✓ kwaai/the-pi-is-bob D1
+  ✓ kwaai/the-pi-is-bob D2
+  ✗ kwaai/the-pi-is-bob D3 — The telling states one build causes an illegal instruction on a Pi 4, but the source specifies a Pi 5 is fine.
+  ✓ kwaai/the-receipt D1
+  ✗ kwaai/the-receipt D2 — Forking a page is presented as a working countersignature, while the source states a valid DisclosureReceipt requires signatures from both parties.
+  ✗ kwaai/the-receipt D3 — The telling implies a one-to-one mapping, while the source states a shared surface exists without the described features.
+  ✗ kwaai/two-trust-ladders D1 — Credential trust is a primary sort, not a tie-break.
+  ✗ kwaai/two-trust-ladders D2 — Credentials are not used for initial peer selection.
+  ✓ kwaai/two-trust-ladders D3
+  ✓ kwaai/welcome-visitors D1
+  ✓ kwaai/welcome-visitors D2
+  ✗ kwaai/welcome-visitors D3 — Forks are records, but the source says forking is a *way* to record disagreement.
+  ✓ kwaai/what-the-store-holds D1
+  ✗ kwaai/what-the-store-holds D2 — Vectors are encrypted at rest.
+  ✗ kwaai/what-the-store-holds D3 — Vectors are encrypted at rest.
+  ✗ kwaai/what-this-does-not-prove D1 — Findings are confirmed (source says findings are doubted until confirmed).
+  ✓ kwaai/what-this-does-not-prove D2
+  ✗ kwaai/what-this-does-not-prove D3 — The wire has been watched.
+
+  36 tellings checked by gemma3:12b · 22 contradict their source · 0 unverifiable

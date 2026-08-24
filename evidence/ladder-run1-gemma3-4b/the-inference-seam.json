@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "the-inference-seam",
+ "title": "The Inference Seam",
+ "source": "2af75f0cb4010335",
+ "sourceWords": 209,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:53.337Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The system tokenizes a prompt and transmits raw token IDs to the first peer. The first peer downloads the embedding table. Subsequent peers receive hidden states. Retrieval systems send private chunks to the mesh. The condition for sMCP holds only when the AI model runs locally or in a trusted enclave.",
+   "words": 51,
+   "address": "sha256:91e18bd90bfba9e70a31f9997c9efc3e",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "The entire inference process relies on a single peer receiving the raw token IDs of the prompt. This peer alone possesses the embedding table and therefore sees the complete prompt.",
+   "words": 30,
+   "address": "sha256:abee81794a8bba6237e26bc71671c216",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "The telling implies all inference relies on one peer, while the source states peers 2..N see hidden states."
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "First node receives token IDs. A one-way map from prompt to hidden states. Embedding table downloaded by one peer. A predicate over a set of peers. Three parties involved. Quantities: one initial token ID transmission.",
+   "words": 35,
+   "address": "sha256:970da34485b2b5d592d217235d87e1ca",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Three parties involved (source specifies a chain, implying more than two peers, but not necessarily three)."
+   }
+  }
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "how-to-check-this",
+ "title": "How To Check This",
+ "source": "dddd5b8d2f5d35a9",
+ "sourceWords": 159,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:11:33.436Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The applicant executes a command against `main` at commit `50558c6` (workspace version 0.5.5) and the v0.5.4 release binaries. The gate identifies the relevant pins. Claims are labelled as “Verified” or “Reported” based on observation or documentation. The registry maintains the `VERIFY.md` command list, which must be re-run against the current `main` version.",
+   "words": 57,
+   "address": "sha256:56c4dcc2e5496c8a4fff3e5280440395",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Assertions regarding KwaaiNet are the results of external commands executed against specific codebase versions. Verification relies on comparing claims to the `main` branch at commit `50558c6` or the v0.5.4 release binaries, recognizing distinct pin differences.",
+   "words": 37,
+   "address": "sha256:5bae86cbf0f1d39149d52de01f224360",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": true,
+    "why": null
+   }
+  },
+  "D3": {
+   "telling": "MATHS",
+   "text": "Three labels: Verified, Reported, Open. A predicate over a set of commands. A one-way map linking claims to execution. Two distinct pins, identified by the lane. Line numbers are mutable, referencing “main”.",
+   "words": 32,
+   "address": "sha256:1c10bdfbc74dd843163bcc66c945fdf4",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Claims are a one-way map (telling) vs. claims are derived (source)."
+   }
+  }
+ }
+}

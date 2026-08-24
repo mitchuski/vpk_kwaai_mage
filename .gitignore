@@ -1,0 +1,10 @@
+# Kwaai's whitepaper text, extracted for private review. Their copyright, not ours --
+# quote it, do not redistribute it. evidence/VERIFY.md records where it came from.
+evidence/vpk-whitepaper-extract.txt
+
+# local navigation -- names private paths and unpublished plans
+LOCAL-POINTERS.md
+
+# scratch
+*.tmp
+.DS_Store

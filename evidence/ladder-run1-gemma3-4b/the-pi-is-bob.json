@@ -1,0 +1,34 @@
+{
+ "kind": "vpkb.ladder/1",
+ "site": "kwaai",
+ "slug": "the-pi-is-bob",
+ "title": "The Pi Is Bob",
+ "source": "6a338df1104d4cba",
+ "sourceWords": 239,
+ "model": "gemma3:4b",
+ "at": "2026-08-20T18:12:01.420Z",
+ "tiers": {
+  "D1": {
+   "telling": "ACTIONS",
+   "text": "The data owner determined a Raspberry Pi could host a KwaaiNet node. The node utilized keys, an embedding model, a mapping table, and a plaintext store. Inference was deemed unsuitable due to bandwidth limitations. A gnu build was compiled, emitting ARMv8.2 instructions. The musl build was selected to avoid these instructions. Installation was performed manually to ensure compatibility with glibc version 2.34.",
+   "words": 64,
+   "address": "sha256:77c35fc213c6508168df9e1a6a8adb37",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Inference was deemed unsuitable."
+   }
+  },
+  "D2": {
+   "telling": "PRINCIPLES",
+   "text": "Data integrity requires a dedicated, always-on system for input/output operations, unsuitable for computationally intensive tasks like inference. The system’s architecture must align with its core components, avoiding incompatible instruction sets.",
+   "words": 31,
+   "address": "sha256:a072721fd24bf6a4008176379340d46b",
+   "entailment": {
+    "model": "gemma3:12b",
+    "ok": false,
+    "why": "Inference is unsuitable."
+   }
+  }
+ }
+}
