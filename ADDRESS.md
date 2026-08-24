@@ -6,9 +6,12 @@ This lane is offered as a **contribution of the agentprivacy universe to KwaaiNe
 Virtual Private Knowledge protocol. It is not a fork, not a competing design, and not a request
 for anything.
 
-We arrived because a Raspberry Pi could not run an inference node, stayed because the whitepaper
-asked its open questions more honestly than most, and found one seam its own text names and its
-code leaves open: **sMCP's guarantee is conditioned on the model running locally or in a trusted
+This is not first contact. The author has been part of the Kwaai community — supporting the
+research and contributing on UX — and this lane is that participation converging with the
+agentprivacy universe's own instruments, offered back where the two bodies of work meet. The
+technical thread began because a Raspberry Pi could not run an inference node; we stayed because
+the whitepaper asked its open questions more honestly than most, and found one seam its own text
+names and its code leaves open: **sMCP's guarantee is conditioned on the model running locally or in a trusted
 enclave, and on a heterogeneous mesh that condition does not hold.** What is left over is the
 plaintext context window on a stranger's machine.
 
@@ -55,7 +58,7 @@ Where this work can be found, in the order it becomes reachable.
 | `vpk.localhost` | the pathway lane explaining itself as a wiki, 11 pages | the local farm |
 | **`kwaai.localhost`** *(to mint)* | **this research as a federated wiki space** -- the findings, the ladder, the address, forkable | the local farm, then the tailnet |
 | `<site>-<token>.example` | any granted slice, per peer, per grant | one named tailnet peer, at one tier, until expiry |
-| a public repository *(undecided)* | whatever of the above is ruled shareable | anyone |
+| [`github.com/mitchuski/vpk_kwaai_mage`](https://github.com/mitchuski/vpk_kwaai_mage) | this lane, published | anyone |
 
 The federation address is the one that matters for the offer. A wiki page is **forkable**, and
 in this federation a fork is not a copy -- it is an act with provenance, and it is the closest

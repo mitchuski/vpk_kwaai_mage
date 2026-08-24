@@ -121,7 +121,10 @@ PHE cannot go. Which of the three carries the weight for a given corpus is the o
 
 ## How claims are labelled
 
-Because a lot of this is a stranger telling you things about your own codebase:
+The author is part of the Kwaai community — supporting the research, contributing on UX — and
+this lane is that involvement converging with our own instruments. But familiarity is not
+evidence, and a lot of this is still one participant telling maintainers things about code they
+know better. So every claim carries its tier:
 
 - **VERIFIED** -- read in the source or observed in a binary, with the command recorded.
 - **REPORTED** -- stated by Kwaai's documents; taken at face value, not re-derived.
