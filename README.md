@@ -112,6 +112,7 @@ PHE cannot go. Which of the three carries the weight for a given corpus is the o
 | `OBSERVATION.md` | G0: the prompt, captured off the wire and detokenized. What it settles and what it does not. |
 | `MEASUREMENTS.md` | Two real runs of the ladder on this lane's own pages (4b, then 27b + a second-model entailment audit). Three negative results and the guard they forced. |
 | `CONVERGENCE.md` | Where the Privacy Is Value model and VPK meet: R(t) gives the tiers a shelf life; multiplicative gating says PHE is one factor of three. Ends with eight practices a node host can use. |
+| `RUNTIME-AUDIT.md` | The runtime read end to end with the same scepticism this lane applies to KwaaiNet: what held, what was fixed, and the gap we share with upstream. |
 | `CONNECTIONS.md` | Where our prior work already fits the VPK problem. Written in our own vocabulary. |
 | `GLOSSARY.md` | Both vocabularies, side by side. |
 | `evidence/VERIFY.md` | The commands behind every source claim. Re-runnable, and it ends by naming what is *not* verified. |
