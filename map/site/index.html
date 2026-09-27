@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KwaaiNet · the network, seen whole</title>
+<meta name="description" content="The KwaaiNet map as a constellation: every peer the crawler can see, seated on the globe by where it is and folded onto the inference chain by what it serves. Reads the same /api/v1/state the fleet reads. Walk peers into a City Key.">
+<link rel="icon" type="image/png" href="assets/kwaai-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,400&family=Spline+Sans+Mono:wght@300;400;500&display=swap');
+  :root{ --ink:#e8edff; --dim:#7c86b8; --line:rgba(120,140,220,0.16); --glass:rgba(10,13,28,0.70);
+    --kwaai:#3B82F6; --green:#10B981; --purple:#8B5CF6; --amber:#F59E0B; --red:#EF4444; --teal:#14B8A6;
+    --sword:#e8523a; --mage:#4dd9e8; --gold:#E0A526; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; overflow:hidden; }
+  body{ font-family:'Spline Sans Mono',monospace; color:var(--ink);
+    background:radial-gradient(120% 90% at 28% 14%, rgba(59,130,246,0.12), transparent 55%),
+      radial-gradient(110% 80% at 80% 88%, rgba(16,185,129,0.07), transparent 55%),
+      radial-gradient(140% 140% at 50% 50%, #0B0E14 0%, #060810 60%, #020308 100%); }
+  #scene{ position:fixed; inset:0; width:100%; height:100%; display:block; cursor:grab; }
+  #scene:active{ cursor:grabbing; }
+  a{ color:#9fc0ff; text-decoration:none; } a:hover{ text-decoration:underline; }
+  button{ font-family:inherit; }
+
+  header.top{ position:fixed; top:0; left:0; right:0; padding:22px 26px 0; pointer-events:none; z-index:5; }
+  header.top a{ pointer-events:auto; }
+  .eyebrow{ font-size:10px; letter-spacing:0.32em; text-transform:uppercase; color:var(--dim); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .eyebrow img{ height:18px; width:auto; opacity:0.85; }
+  .eyebrow a{ color:#7fe8d8; letter-spacing:0.2em; }
+  h1{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:clamp(26px,4vw,44px); line-height:1.12; padding-bottom:4px;
+    background:linear-gradient(100deg,#9fc0ff,#e8edff 44%,#7fe8d8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #status{ margin-top:6px; font-size:10px; color:var(--dim); letter-spacing:0.04em; line-height:1.55; max-width:640px; }
+  #status b{ color:#7fe8d8; font-weight:500; }
+  #status .src{ color:#ffd27a; } #status .src.baked{ color:#ff9d9d; }
+
+  .panel{ position:fixed; z-index:6; background:var(--glass); border:1px solid var(--line); border-radius:14px; padding:14px; backdrop-filter:blur(10px); }
+  .sect{ font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; }
+  .sect .n{ color:#7fe8d8; letter-spacing:0; }
+
+  /* ===== the side: one panel on the LEFT, a column of named tabs beside it; the card on the right ===== */
+  /* the side: a vertical column of named tabs at the top right, the open section in a panel beside it; closed = the column alone */
+  #tabs{ position:fixed; right:14px; top:14px; z-index:9; display:flex; flex-direction:column; gap:4px; }
+  #tabs button, #tabs a{ width:62px; padding:7px 4px 6px; border-radius:10px; cursor:pointer; background:rgba(10,13,28,0.55); border:1px solid var(--line);
+    color:var(--dim); display:flex; flex-direction:column; align-items:center; gap:3px; backdrop-filter:blur(8px); transition:all .15s; text-decoration:none; }
+  #tabs .g{ font-size:14px; line-height:1; } #tabs .w{ font-size:7.5px; letter-spacing:0.1em; text-transform:uppercase; }
+  #tabs button:hover, #tabs a:hover{ color:var(--ink); border-color:rgba(120,140,220,0.4); }
+  #tabs button.on{ color:#04050b; background:linear-gradient(120deg,#9fc0ff,#7fe8d8); border-color:transparent; }
+  #side{ position:fixed; right:88px; top:14px; bottom:14px; width:364px; z-index:8; display:flex; flex-direction:column;
+    background:var(--glass); border:1px solid var(--line); border-radius:16px; backdrop-filter:blur(14px); box-shadow:0 14px 50px rgba(0,0,0,0.34); }
+  #side.closed{ display:none; }
+  #sideHead{ display:flex; align-items:center; gap:8px; padding:12px 14px 10px; border-bottom:1px solid var(--line); }
+  #sideHead .t{ flex:1; font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--dim); }
+  #sideHead button{ background:none; border:none; color:var(--dim); cursor:pointer; font-size:15px; line-height:1; } #sideHead button:hover{ color:var(--ink); }
+  #sideBody{ flex:1; overflow-y:auto; overflow-x:hidden; padding:13px 14px 16px; }
+  #sideBody section{ display:none; } #sideBody section.on{ display:block; }
+  #sideBody .panel{ position:static !important; width:auto !important; background:none; border:none; backdrop-filter:none; border-radius:0; padding:0; display:block !important; }
+
+  .chip{ display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:9px; cursor:pointer; border:1px solid transparent; transition:all .15s; }
+  .chip:hover{ border-color:var(--line); } .chip.iso{ border-color:rgba(232,237,255,0.4); background:rgba(120,140,220,0.08); } .chip.dim{ opacity:0.32; }
+  .gem{ width:10px; height:10px; border-radius:50%; flex:none; background:currentColor; box-shadow:0 0 10px currentColor; }
+  .chip .nm{ font-size:10.5px; line-height:1.3; flex:1; color:var(--ink); } .chip .nm span{ color:var(--dim); font-size:9px; display:block; }
+  .chip .ct{ font-size:9.5px; color:var(--dim); font-variant-numeric:tabular-nums; }
+  .foot{ margin-top:10px; padding-top:9px; border-top:1px solid var(--line); font-size:8.5px; color:var(--dim); line-height:1.55; }
+  .foot b{ color:#ffd6a0; font-weight:500; }
+
+  .row{ margin-bottom:10px; }
+  .row .lbl{ display:flex; justify-content:space-between; font-size:9.5px; color:var(--dim); margin-bottom:5px; letter-spacing:0.04em; }
+  .row .lbl .v{ color:#7fe8d8; font-variant-numeric:tabular-nums; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:3px; outline:none; background:linear-gradient(90deg,#10B981,#3B82F6); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#eef2ff; border:2px solid #0a0d1c; cursor:pointer; box-shadow:0 0 9px rgba(160,220,255,0.8); }
+  .togs, .cbar{ display:flex; flex-wrap:wrap; gap:5px; } .cbar{ margin-top:8px; }
+  .togs button, .cbar button, .cbar label.btn{ font-size:9px; letter-spacing:0.03em; padding:5px 9px; border-radius:7px; cursor:pointer; background:rgba(120,140,220,0.07); border:1px solid var(--line); color:var(--dim); transition:all .15s; }
+  .togs button:hover, .cbar button:hover, .cbar label.btn:hover{ color:var(--ink); border-color:rgba(120,140,220,0.45); }
+  .togs button.on, .cbar button.on{ color:#04050b; background:linear-gradient(120deg,#9fc0ff,#7fe8d8); border-color:transparent; font-weight:500; }
+  .cbar button:disabled{ opacity:0.35; cursor:default; }
+  .hint{ font-size:8.5px; color:var(--dim); line-height:1.55; margin-top:8px; } .hint b{ color:var(--ink); font-weight:500; }
+  #pal{ display:flex; gap:6px; align-items:center; } #pal label{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:7.5px; letter-spacing:0.1em; color:var(--dim); }
+  #pal input{ width:30px; height:22px; border:1px solid var(--line); border-radius:6px; background:none; padding:1px; cursor:pointer; }
+
+  .fin{ width:100%; font-family:inherit; font-size:10px; padding:6px 9px; border-radius:8px; background:rgba(8,10,22,0.6); border:1px solid var(--line); color:var(--ink); }
+  .fin:focus{ outline:none; border-color:rgba(59,130,246,0.6); }
+  #findList{ margin-top:8px; max-height:300px; overflow:auto; }
+  .frow{ display:flex; gap:8px; align-items:baseline; padding:4px 6px; border-radius:7px; cursor:pointer; font-size:10px; border:1px solid transparent; }
+  .frow:hover{ border-color:var(--line); background:rgba(120,140,220,0.05); }
+  .frow .d{ width:7px; height:7px; border-radius:50%; background:currentColor; flex:none; box-shadow:0 0 6px currentColor; align-self:center; }
+  .frow .t{ flex:1; color:var(--ink); } .frow .m{ color:var(--dim); font-size:8.5px; }
+  table.t{ width:100%; border-collapse:collapse; font-size:9px; }
+  table.t th{ text-align:left; font-weight:500; color:var(--dim); letter-spacing:0.08em; text-transform:uppercase; font-size:7.5px; padding:4px 4px; cursor:pointer; border-bottom:1px solid var(--line); white-space:nowrap; }
+  table.t th.on{ color:#7fe8d8; }
+  table.t td{ padding:4px 4px; border-bottom:1px solid rgba(120,140,220,0.07); color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:110px; }
+  table.t tr.r{ cursor:pointer; } table.t tr.r:hover td{ background:rgba(120,140,220,0.06); } table.t tr.sel td{ background:rgba(59,130,246,0.14); }
+  table.t td.num{ font-variant-numeric:tabular-nums; text-align:right; }
+  .dot{ display:inline-block; width:7px; height:7px; border-radius:50%; background:currentColor; box-shadow:0 0 6px currentColor; margin-right:5px; vertical-align:middle; }
+
+  /* the node card */
+  #nodeCard{ left:22px; top:176px; width:344px; max-height:calc(100vh - 340px); overflow:auto; display:none; padding:14px 15px 15px; }   /* under the title; the presence and walk cards sit beneath it */
+  #nodeCard.open{ display:block; }
+  #nodeCard .nx{ position:absolute; top:9px; right:11px; background:none; border:none; color:var(--dim); font-size:15px; cursor:pointer; line-height:1; }
+  #nodeCard .nx:hover{ color:var(--ink); }
+  /* 🛰️ in the bottom bar shows and hides the card; folded = gone */
+  #nodeCard.min{ display:none !important; }
+  #nodeCard h2{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:20px; line-height:1.15; margin:2px 22px 4px 0; overflow-wrap:anywhere; }
+  #nodeCard .badges{ display:flex; flex-wrap:wrap; gap:5px; margin:6px 0 10px; }
+  .badge{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; border:1px solid currentColor; line-height:1.5; }
+  .badge.fill{ color:#04050b; border-color:transparent; }
+  #nodeCard .grp{ margin-top:11px; padding-top:9px; border-top:1px solid var(--line); } #nodeCard .grp .sect{ margin-bottom:7px; }
+  .kv{ display:flex; gap:8px; padding:2px 0; }
+  .kv .k{ flex:none; width:88px; font-size:8px; letter-spacing:0.08em; text-transform:uppercase; color:var(--dim); padding-top:2px; }
+  .kv .v{ flex:1; min-width:0; font-size:10.5px; line-height:1.45; overflow-wrap:anywhere; }
+  .kv .v i{ color:var(--dim); font-style:normal; } .kv .v .ok{ color:#9ff0d4; } .kv .v .no{ color:#ff9d9d; } .kv .v .wa{ color:#ffd27a; }
+  .cp{ font-size:8px; padding:1px 6px; margin-left:6px; border-radius:5px; cursor:pointer; background:rgba(120,140,220,0.08); border:1px solid var(--line); color:var(--dim); vertical-align:middle; }
+  .cp:hover{ color:var(--ink); } .cp.on{ color:#ff9d9d; border-color:#ff9d9d; }
+  .bar{ height:8px; border-radius:4px; background:rgba(120,140,220,0.1); position:relative; overflow:hidden; margin-top:4px; } .bar i{ position:absolute; top:0; bottom:0; border-radius:4px; }
+  .claim{ font-size:8px; letter-spacing:0.1em; color:#ffd27a; }
+  .note{ font-size:9px; line-height:1.55; color:var(--dim); margin-top:4px; } .note b{ color:var(--ink); font-weight:500; }
+  .addr{ font-size:9px; color:var(--dim); line-height:1.5; overflow-wrap:anywhere; padding:3px 0; border-bottom:1px dashed rgba(120,140,220,0.1); } .addr:last-child{ border-bottom:none; }
+  .bits{ display:inline-flex; gap:2px; vertical-align:middle; } .bits i{ width:14px; height:14px; border-radius:3px; display:grid; place-items:center; font-size:8px; background:rgba(120,140,220,0.08); color:var(--dim); font-style:normal; }
+  .bits i.on{ background:rgba(232,237,255,0.85); color:#04050b; }
+
+  /* coverage */
+  #coverage{ left:390px; right:470px; bottom:64px; width:auto; max-width:760px; margin:0 auto; padding:11px 14px 10px; }   /* between the card and the open panel */
+  #covBar{ display:flex; gap:2px; height:22px; }
+  #covBar .c{ flex:1; border-radius:3px; cursor:pointer; opacity:0.85; transition:opacity .15s, transform .15s; }
+  #covBar .c:hover{ opacity:1; transform:translateY(-2px); } #covBar .c.iso{ outline:1px solid #e8edff; opacity:1; }
+  #covBar .c.lit{ opacity:1; box-shadow:0 0 10px currentColor; } #covBar .c.dimmed{ opacity:0.2; }
+  #covFoot{ display:flex; justify-content:space-between; margin-top:7px; font-size:8.5px; color:var(--dim); letter-spacing:0.04em; } #covFoot b{ color:#7fe8d8; font-weight:500; }
+
+  /* the walk HUD */
+  #walkHud{ left:22px; bottom:24px; padding:9px 13px; max-width:344px; display:none; text-align:left; }   /* bottom left, under the card */
+  #walkHud.on{ display:block; }
+  #walkHud .big{ font-size:14px; color:#ffd6c7; font-variant-numeric:tabular-nums; } #walkHud .sm{ font-size:8.5px; color:var(--dim); letter-spacing:0.05em; margin-top:2px; }
+
+  #tip{ position:fixed; z-index:9; pointer-events:none; display:none; max-width:290px; background:var(--glass); border:1px solid rgba(59,130,246,0.45); border-radius:9px; padding:8px 11px; font-size:10.5px; line-height:1.45; backdrop-filter:blur(9px); }
+  #tip b{ color:#dff4ff; font-weight:500; } #tip .m{ color:var(--dim); font-size:9px; }
+  /* the presence card — rises bottom-right, above the walk card, as the light crosses a peer */
+  #runCard{ position:fixed; z-index:8; left:22px; bottom:88px; transform:translateY(12px); max-width:344px; pointer-events:none; opacity:0; transition:opacity .35s ease, transform .35s ease;
+    background:var(--glass); border:1px solid rgba(255,210,122,0.45); border-radius:10px; padding:8px 13px; font-size:11px; line-height:1.5; backdrop-filter:blur(9px); text-align:left; }
+  #runCard.show{ opacity:1; transform:none; } #runCard b{ color:#ffe9c4; font-weight:500; } #runCard .m{ color:var(--dim); font-size:9px; }
+  /* the coverage panel folds to one line */
+  /* 🧱 in the bottom bar shows and hides the coverage panel; folded = gone (the recorder keeps running) */
+  #coverage.min{ display:none !important; }
+  #covMini{ display:none; }
+  #zenbar button.on{ color:var(--ink); border-color:rgba(127,232,216,0.55); }
+  #zenbar button .rd{ display:none; width:6px; height:6px; border-radius:50%; background:#ff5d5d; margin-left:5px; vertical-align:middle; box-shadow:0 0 6px #ff5d5d; }
+  #zenbar button.rec .rd{ display:inline-block; }
+  body.zen #runCard{ display:none !important; }
+  #zenbar{ position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:10; display:flex; gap:6px; transition:opacity .2s; }
+  #zenbar button{ font-size:9.5px; letter-spacing:0.08em; padding:6px 12px; border-radius:999px; background:rgba(10,13,28,0.55); border:1px solid var(--line); color:var(--dim); cursor:pointer; backdrop-filter:blur(8px); }
+  #zenbar button:hover{ color:var(--ink); border-color:rgba(120,140,220,0.45); }
+  body.zen header.top, body.zen .panel, body.zen footer, body.zen #tip, body.zen #tabs, body.zen #side, body.zen #coverage{ display:none !important; }
+  body.zen #zenbar{ opacity:0.3; } body.zen #zenbar:hover{ opacity:1; }
+  footer{ position:fixed; left:0; right:0; bottom:0; padding:0 26px 6px; z-index:4; pointer-events:none; display:flex; justify-content:center; }
+  footer .pv{ font-size:9px; color:var(--dim); letter-spacing:0.06em; opacity:0.75; }
+
+  article.ab{ font-size:10.5px; line-height:1.6; color:var(--dim); } article.ab p{ margin-bottom:8px; } article.ab b{ color:var(--ink); font-weight:500; }
+  article.ab code{ font-size:9.5px; color:#cfe0ff; } article.ab ul{ padding-left:14px; margin-bottom:8px; } article.ab li{ margin-bottom:3px; }
+  .srcline{ font-size:9px; color:var(--dim); line-height:1.6; margin-bottom:8px; } .srcline b{ color:#7fe8d8; font-weight:500; }
+  table.m{ width:100%; border-collapse:collapse; font-size:9px; margin:6px 0 8px; }
+  table.m td{ padding:3px 4px; border-bottom:1px solid rgba(120,140,220,0.08); color:var(--dim); vertical-align:top; } table.m td.n{ color:#7fe8d8; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; } table.m td b{ color:var(--ink); font-weight:500; }
+  .door{ display:flex; gap:8px; align-items:baseline; padding:4px 0; border-bottom:1px solid rgba(120,140,220,0.07); font-size:9.5px; }
+  .door .st{ width:8px; height:8px; border-radius:50%; flex:none; background:#3a4160; align-self:center; } .door .st.ok{ background:#10B981; box-shadow:0 0 6px #10B981; } .door .st.no{ background:#EF4444; } .door .st.q{ background:#F59E0B; }
+  .door a, .door .u{ color:var(--ink); } .door .m{ color:var(--dim); font-size:8.5px; margin-left:auto; text-align:right; }
+  .kdrop{ border:1px dashed var(--line); border-radius:9px; padding:8px; font-size:9px; color:var(--dim); text-align:center; margin-top:8px; } .kdrop.over{ border-color:#7fe8d8; color:var(--ink); }
+  #walkList .frow .t{ font-variant-numeric:tabular-nums; }
+  .crow{ display:flex; gap:8px; align-items:baseline; font-size:9.5px; padding:3px 0; } .crow .cn{ color:#ffe6c2; cursor:pointer; flex:1; } .crow .cn:hover{ text-decoration:underline; } .crow .cm{ color:var(--dim); font-size:8.5px; } .crow .cx{ color:var(--dim); cursor:pointer; padding:0 3px; } .crow .cx:hover{ color:#e8523a; }
+
+  @media (max-width:1180px){ #coverage{ left:16px; right:16px; max-width:none; margin:0 } }   /* a narrower window: the bar spans, panels overlap it rather than crush it */
+  @media (max-width:760px){
+    footer{ display:none } header.top{ padding:14px 16px 0 } h1{ font-size:clamp(20px,6vw,30px) } #status{ font-size:9px }
+    #tabs{ right:10px; left:10px; top:auto; bottom:10px; flex-direction:row; flex-wrap:wrap; justify-content:center } #tabs button, #tabs a{ width:52px; padding:5px 2px }
+    #side{ left:10px; right:10px; top:auto; bottom:64px; width:auto; max-height:60vh }
+    #nodeCard{ left:10px; right:10px; width:auto; top:auto; bottom:64px; max-height:58vh }
+    #coverage{ bottom:auto; top:118px; left:10px; right:10px; width:auto; max-width:none; padding:8px 10px } #zenbar{ display:none } #walkHud{ display:none !important }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<header class="top">
+  <div class="eyebrow"><img src="assets/kwaai-logo.png" alt="Kwaai"> map.kwaai.ai · the network, seen whole · <a href="guide.html">guide →</a> · <a href="reader.html">reader →</a></div>
+  <h1>KwaaiNet Constellation</h1>
+  <div id="status">reading the network…</div>
+</header>
+
+<aside id="nodeCard" class="panel"><button class="nx" title="close (Esc)">×</button><div id="nodeBody"></div></aside>
+<div id="walkHud" class="panel"><div class="big" id="wT">T(π) 1.00</div><div class="sm" id="wS">walk peers into a key</div></div>
+
+<div id="coverage" class="panel">
+  <div class="sect">block coverage · <span class="n" id="covModel">—</span> <span id="covMini"></span></div>
+  <div id="covBar"></div>
+  <div id="covFoot"><span id="covL">block 0</span><span id="covM"></span><span id="covR"></span></div>
+  <canvas id="covRec" style="display:block;width:100%;height:0;margin-top:6px;border-radius:4px"></canvas>
+  <div id="recRow" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:8.5px;color:var(--dim)"><span><button class="cp" id="recBtn" style="margin-left:0">● rec</button> <span id="recN">0 observations</span></span><span>each crawl writes one row of bits — the circuit that records your observation</span></div>
+</div>
+
+<!-- ===== side sections (moved into #sideBody at boot) ===== -->
+<div id="legend" class="panel">
+  <div class="sect">sharding state</div><div id="chipsState"></div>
+  <div class="sect" style="margin-top:12px">how the observer reaches it</div><div id="chipsConn"></div>
+  <div class="sect" style="margin-top:12px">trust tier · from attestations</div><div id="chipsTier"></div>
+  <div class="foot">click a chip to isolate · click a star for its card · <b>shift+click</b> walks it into your key.
+    A tier here is a <b>reading surface, not evidence</b>: the count of attestations a node announces, banded by the v2 design thresholds.</div>
+</div>
+
+<div id="view" class="panel">
+  <div class="row"><div class="lbl"><span>globe ⇄ chain ⇄ star</span><span class="v" id="foldV">globe</span></div><input type="range" id="fold" min="0" max="2" step="0.001" value="0"></div>
+  <div class="togs" style="margin:-4px 0 10px"><button data-f="0" class="on">globe</button><button data-f="1">chain</button><button data-f="2">star</button></div>
+  <div class="row"><div class="lbl"><span>colour by</span></div>
+    <div class="togs" id="colourBy"><button data-c="state" class="on">state</button><button data-c="conn">reach</button><button data-c="tier">tier</button><button data-c="seam">seam</button><button data-c="model">stratum</button></div></div>
+  <div class="row"><div class="lbl"><span>layers</span></div>
+    <div class="togs">
+      <button id="tLand" class="on">land</button><button id="tGrid" class="on">graticule</button><button id="tBlocks" class="on">blocks</button>
+      <button id="tChain" class="on">chain</button><button id="tRelays" class="on">relays</button><button id="tLattice">lattice</button><button id="tKey">key</button><button id="tLabels" class="on">labels</button>
+      <button id="tDrift" class="on">drift</button><button id="tGlow" class="on">glow</button>
+    </div></div>
+  <div class="row"><div class="lbl"><span>palette — yours to keep, it travels in your key</span><span class="v" id="palReset" style="cursor:pointer" title="back to the carrier canon">reset</span></div>
+    <div id="pal"></div></div>
+  <div class="hint"><b>chain</b> threads two serving peers whose ranges let one follow the other. <b>relays</b> thread a relayed peer to its bootstrap. <b>lattice</b> threads two peers one sovereignty flip apart. The four wells are the City Key carrier palette: cool is the ocean, warm the land and labels, sword the boundary reading, mage the threads.</div>
+  <div class="hint"><span id="layoutReset" style="cursor:pointer;color:#ffd27a">forget the remembered layout</span> — tab, folds, palette and my node are reset and the page reloads; saved constellations and observations are kept.</div>
+</div>
+
+<div id="find" class="panel">
+  <input class="fin" id="findQ" placeholder="name · peer id · city · version · model">
+  <div id="findList"></div>
+  <div class="hint">a found node is selected and the camera flies to it · deep link <code>?node=&lt;peer id&gt;</code> · press <b>/</b> to search</div>
+</div>
+
+<div id="peers" class="panel">
+  <table class="t"><thead><tr id="tHead"><th data-k="name">name</th><th data-k="status">state</th><th data-k="blocks">blocks</th><th data-k="throughput">tok/s</th><th data-k="vertex">V</th><th data-k="place">where</th></tr></thead><tbody id="tBody"></tbody></table>
+</div>
+
+<div id="seam" class="panel">
+  <article class="ab">
+    <p><b>The inference seam.</b> A KwaaiNet chain tokenizes the prompt on the coordinator and ships <b>raw token IDs</b> to the first block server, the only peer holding the embedding table. Peers after it receive f16 hidden states. The privacy boundary of a chain is <b>one peer</b>, and that peer sees the whole prompt. <span class="claim">F1 · OBSERVED</span></p>
+    <p>Colour by <b>seam</b>: <span style="color:var(--sword)">■</span> serving block 0 — receives every routed prompt as token IDs · <span style="color:var(--mage)">■</span> serving later blocks — hidden states · <span style="color:#3a4160">■</span> not in the chain. A gold ring marks a <b>VPK Eve</b> host, which today holds embeddings in the clear. <span class="claim">F4 · VERIFIED + REPORTED</span></p>
+    <div id="seamStats" class="srcline"></div>
+    <div class="cbar"><button id="seamOn">colour by seam</button><button id="seamFirst">isolate first-block servers</button></div>
+    <p style="margin-top:10px"><b>Two ladders.</b> The tier chips band <code>trust_attestations</code>. Chain selection in the client sorts on a <i>behaviour</i> score and filters on nothing; the credential ladder never touches peer selection. <span class="claim">F3 · VERIFIED</span></p>
+    <p>Source: <a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai_mage</a> — FINDINGS F1 · F3 · F4. The map is a reading surface for them, not a measurement.</p>
+  </article>
+</div>
+
+<div id="key" class="panel">
+  <div class="srcline" id="keyLine">no peers walked yet</div>
+  <div id="walkList"></div>
+  <div class="cbar"><button id="wRun">▶ observe</button><button id="wClear">clear</button><button id="wSave">✦ save</button><button id="wExport">⬇ export key</button><label class="btn" for="wImport">⬆ import</label><input id="wImport" type="file" accept=".json,.png,application/json,image/png" style="display:none"><button id="wSnap">📷 keepsake</button></div>
+  <div id="witLine" class="srcline" style="margin-top:8px"></div>
+  <div class="cbar"><button id="wBoundary">⬡ the whole network as a star key</button></div>
+  <div class="hint">the boundary key seats <b>every</b> peer at its vertex and lists the edges the network realises on ∂M — chain threads and one-flip pairs — as vertex pairs. Seating, palette and names stay out of its <code>packets.root</code>, so the same crawl reads the same root on the globe, the chain, the star, or in another instrument: the boundary encodes the bulk.</div>
+  <div class="row" style="margin-top:10px"><div class="lbl"><span>my node · public name or peer id</span><span class="v" id="myNodeV">—</span></div><input class="fin" id="myNode" placeholder="e.g. anonymous-windows-x86_64"></div>
+  <div class="kdrop" id="kdrop">drop a City Key here — JSON, or a keepsake PNG carrying one</div>
+  <div id="kImported" class="srcline" style="margin-top:8px"></div>
+  <div class="cbar"><button id="kClear">dismiss the imported key</button></div>
+  <div class="hint">an imported key arrives as <b>its own layer</b>, in its own palette: /star's manifold around the globe, the dual cores at the centre, the 64 inside with ∂M, its lit vertices burning. The globe keeps its colours. Peers standing on a lit vertex are ringed in the key's sword colour; fold to the star to see them on the ring.</div>
+  <div class="sect" style="margin-top:12px">saved constellations</div><div id="cList"></div>
+  <div class="hint"><b>What the key is.</b> A version-1 City Key: a name, the four palette colours, and the lattice vertices your walked peers sit on (their <b>lit</b> set), with the walked peers and moves under <code>source</code>. Its <b>κ</b> is the SHA-256 of the canonical form, so any instrument can re-derive and check it. The keepsake PNG carries the same key in a <code>cityKey</code> chunk, so it opens in the Star at <a href="https://soulbis.com/lattice" target="_blank" rel="noreferrer">/lattice</a>, <a href="https://soulbis.com/star" target="_blank" rel="noreferrer">/star</a> and <a href="https://soulbis.com/skye" target="_blank" rel="noreferrer">/skye</a>. A key is a reading you chose, not a credential and not a proof.</div>
+</div>
+
+<div id="model" class="panel">
+  <article class="ab">
+    <p><b>Every peer sits on the sovereignty lattice.</b> Six yes/no readings of what the contract says about it give a 6-bit vertex, V0…V63. This reading is a <span class="claim">THESIS</span>: the rules are stated so they can be argued with.</p>
+    <table class="m" id="axisTable"></table>
+    <div class="sect">strata · Pascal's row is the weight</div>
+    <table class="m" id="strataTable"></table>
+    <div class="row"><div class="lbl"><span>network term (1 + Σ wᵢnᵢ/N₀)^k · N₀ = peers</span><span class="v" id="netTerm">—</span></div>
+      <div class="lbl"><span>k · conjectured superlinear, uncalibrated</span><span class="v" id="kV">1.0</span></div><input type="range" id="kSlider" min="0.5" max="2" step="0.05" value="1"></div>
+    <p><b>Moves.</b> Between two peers the lattice names the move: <b>succ</b> 😊, <b>neg</b> ⚔️ the Swordsman's reflection, <b>bnot</b> 🧙 the Mage's antipode, a single <b>flip</b> (vertical, one dimension), or a <b>jump</b>. A walk's <b>T(π) = 1 + β Σ f(e)·g(nₑ)</b> with f = 0.25·flips + 0.75·|Δstratum| (so one flip is 1, a lateral two-flip 0.5), g = 1/√(times walked), β = 1. Uncalibrated by the model's own account; a display register, like the star chart's.</p>
+    <div class="sect">where the paths cross · betweenness in the chain graph</div>
+    <div id="cbList"></div>
+    <p class="hint"><b>Chain threads</b> are coloured by move class when you colour by stratum: mage for a vertical flip, violet lateral, dim for a jump. The <b>lattice</b> layer draws every one-flip pair present in the network — the ∂M edges the live network happens to realise.</p>
+  </article>
+</div>
+
+<div id="observe" class="panel">
+  <div class="srcline" id="obLine">the light is still</div>
+  <div class="cbar"><button id="obRun">▶ run</button><button id="obStep">⏭ step</button><button id="obDir">↻ direction</button></div>
+  <div class="row" style="margin-top:10px"><div class="lbl"><span>speed · world units per second</span><span class="v" id="obSpeedV">0.90</span></div><input type="range" id="obSpeed" min="0.1" max="3" step="0.05" value="0.9"></div>
+  <div class="row"><div class="lbl"><span>route</span></div><div class="togs" id="obRoute"><button data-r="auto" class="on">walk, else chain</button><button data-r="chain">serving chain</button><button data-r="ring">all peers · succ order</button><button data-r="stratum">by stratum</button></div></div>
+  <div class="sect" style="margin-top:12px">witness · visits by vertex</div><div id="obSpent" class="hint" style="margin-top:0"></div>
+  <div class="cbar"><button id="obReset">reset witness</button></div>
+  <div class="sect" style="margin-top:12px">recorder · one row of bits per crawl</div>
+  <div class="cbar" style="margin-top:0"><button id="obRec">● rec</button><button id="obExport">⬇ export observations</button><button id="obClear">clear</button></div>
+  <div id="obRows" class="hint"></div>
+  <div class="hint">The light visits each peer of the route in turn; a visit adds one to that peer's vertex in the witness, and a full lap is a pass. The recorder writes the coverage bits of every new crawl while it is on. Both ride in an exported key as <code>witness</code> and <code>source.observed</code>: records of attention that a later ceremony could attest, not proofs.</div>
+</div>
+
+<div id="doors" class="panel">
+  <div class="srcline" id="srcline">—</div>
+  <div class="cbar"><button id="refreshNow">refresh now</button><button id="autoRef" class="on">auto · 60 s</button></div>
+  <div class="sect" style="margin-top:12px">the network</div><div id="doorsNet"></div>
+  <div class="sect" style="margin-top:12px">your node · local pages when a node runs here <button class="cp" id="probeLocal">probe</button></div><div id="doorsLocal"></div>
+  <div class="sect" style="margin-top:12px">source · docs</div><div id="doorsSrc"></div>
+  <div class="sect" style="margin-top:12px">the star side</div><div id="doorsStar"></div>
+  <div class="sect" style="margin-top:12px">top contributors</div><div id="top5"></div>
+  <div class="sect" style="margin-top:12px">bootstraps · relays seen</div><div id="boots"></div>
+</div>
+
+<nav id="tabs"></nav>
+<aside id="side"><div id="sideHead"><span class="t" id="sideTitle"></span><button id="sideX" title="close (Esc)">×</button></div><div id="sideBody"></div></aside>
+<div id="tip"></div>
+<div id="runCard"></div>
+<div id="zenbar"><button id="zCard" title="show or hide the node card">🛰️ card</button><button id="zCov" class="on" title="show or hide the block coverage">🧱 coverage<span class="rd"></span></button><button id="focusBtn" title="hide the instruments — just the shape (Esc exits)">◌ focus</button><button id="snapBtn" title="save the view as a PNG carrying your key">📷 keepsake</button></div>
+<footer><div class="pv">kwaai · an agentprivacy contribution · reads /api/v1/state · (⚔️⊥⿻⊥🧙)😊</div></footer>
+
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/OrbitControls.js';
+
+// any runtime error shows in the status line, so a reload that misbehaves says why
+addEventListener('error', e=>{ const s=document.getElementById('status'); if(s) s.insertAdjacentHTML('beforeend', `<br><span class="src baked">error · ${String(e.message||e).replace(/[<>]/g,'')}${e.lineno?' · line '+e.lineno:''}</span>`); });
+addEventListener('unhandledrejection', e=>{ const s=document.getElementById('status'); if(s) s.insertAdjacentHTML('beforeend', `<br><span class="src baked">error · ${String(e.reason&&e.reason.message||e.reason).replace(/[<>]/g,'')}</span>`); });
+const TAU = Math.PI*2, R = 1.6, AXIS_W = 4.6;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ease = p => p*p*(3-2*p);
+const hash01 = s => { let h=2166136261; for(const c of String(s)){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return ((h>>>0)%100000)/100000; };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ===== palette — Kwaai tokens for the wire's own vocabulary; the carrier canon for the key =====
+const CANON = { cool:'#141a3d', warm:'#f0eee8', sword:'#e8523a', mage:'#4dd9e8' };   // game42 AXIOMS A6
+const PALKEY = 'kwaai-map-palette-v2'; let PALETTE = { ...CANON };   // v2: an earlier build saved an imported key's palette here; that key is retired
+try{ localStorage.removeItem('kwaai-map-palette'); localStorage.removeItem('kwaai-map-drawer'); }catch(e){}
+try{ Object.assign(PALETTE, JSON.parse(localStorage.getItem(PALKEY)||'{}')); }catch(e){}
+const PAL = {
+  state: { Serving:'#10B981', Loading:'#3B82F6', Idle:'#F59E0B', Departed:'#64748B', Unannounced:'#8B5CF6', Unreachable:'#EF4444', Unknown:'#475569' },
+  conn:  { Direct:'#3B82F6', NAT:'#14B8A6', Relay:'#8B5CF6', Unknown:'#475569' },
+  tier:  { Unknown:'#EF4444', Known:'#F59E0B', Verified:'#8B5CF6', Trusted:'#10B981' },
+  cover: { none:'#EF4444', one:'#F59E0B', many:'#10B981' }, boot:'#c7d2fe', eve:'#E0A526',
+};
+const STATE_ORDER = ['Serving','Loading','Idle','Unannounced','Departed','Unreachable','Unknown'];
+const STATE_WHY = { Serving:'online — answering for its blocks', Loading:'joining — a shard is loading', Idle:'joining — up, promising nothing', Unannounced:'reached over kad, no DHT record', Departed:'announced offline or tombstoned', Unreachable:'v1 probe failed (v1 only)', Unknown:'state not recognised' };
+const CONN_WHY = { Direct:'dialled at its own address', NAT:'DCUtR hole-punched through its NAT', Relay:'only via a bootstrap circuit', Unknown:'no address seen' };
+const TIER_WHY = { Unknown:'0 attestations', Known:'1–2 attestations', Verified:'3–4 attestations', Trusted:'5+ attestations' };
+
+// ===== the lattice reading — six yes/no readings of the contract → a vertex (THESIS) =====
+// A1: protection is the HIGH bit (32) … value the LOW bit (1). Never 1<<index.
+const AXES = [
+  { id:'protection',  v:32, e:'🛡️', word:'attested',         why:'announces ≥1 trust attestation',                       rule:n=>n.attest>=1 },
+  { id:'delegation',  v:16, e:'🤝', word:'holds the prompt', why:'first block server — receives the delegated prompt',  rule:n=>n.seam==='first' },
+  { id:'memory',      v:8,  e:'📜', word:'stores',           why:'offers VPK storage (an Eve)',                          rule:n=>!!n.vpk },
+  { id:'connection',  v:4,  e:'🔗', word:'in the DHT',       why:'named by a DHT record (and speaks kad when known)',    rule:n=>!!n.announced && n.kad!==false },
+  { id:'computation', v:2,  e:'⚡', word:'serves',           why:'serving blocks with announced throughput',              rule:n=>n.status==='Serving' && n.throughput>0 },
+  { id:'value',       v:1,  e:'💎', word:'contributes',      why:'named among the top contributors',                     rule:n=>!!n.rank },
+];
+const W_STRATUM = [1,6,15,20,15,6,1];
+const pc = x => { let c=0; while(x){ c+=x&1; x>>=1; } return c; };
+const b6 = x => x.toString(2).padStart(6,'0');
+const LX = { succ:x=>(x+1)&63, neg:x=>(64-x)&63, bnot:x=>63-x };
+const vertexOf = n => AXES.reduce((v,a)=>v|(a.rule(n)?a.v:0), 0);
+function moveOf(a,b){ if(a===b) return { name:'stay', f:0, cls:'stay', h:0, ds:0 };
+  const x=a^b, h=pc(x), ds=Math.abs(pc(b)-pc(a)), f=0.25*h+0.75*ds;
+  const name = b===LX.succ(a) ? 'succ 😊' : b===LX.neg(a) ? 'neg ⚔️' : b===LX.bnot(a) ? 'bnot 🧙' : h===1 ? 'flip '+AXES.find(ax=>ax.v===x).id : 'jump ×'+h;
+  return { name, f, cls: h===1 ? 'vertical' : ds===0 ? 'lateral' : 'jump', h, ds }; }
+// Brandes betweenness, undirected, normalised — "the value lives where the most paths cross" (V5.4 §10.2)
+function betweenness(nodes, adj){ const CB=new Map(nodes.map(n=>[n,0]));
+  for(const s of nodes){ const S=[], P=new Map(nodes.map(n=>[n,[]])), sig=new Map(nodes.map(n=>[n,0])), d=new Map(nodes.map(n=>[n,-1])); sig.set(s,1); d.set(s,0); const Q=[s];
+    while(Q.length){ const v=Q.shift(); S.push(v); for(const w of adj.get(v)||[]){ if(d.get(w)<0){ Q.push(w); d.set(w,d.get(v)+1); } if(d.get(w)===d.get(v)+1){ sig.set(w,sig.get(w)+sig.get(v)); P.get(w).push(v); } } }
+    const delta=new Map(nodes.map(n=>[n,0]));
+    while(S.length){ const w=S.pop(); for(const v of P.get(w)) delta.set(v, delta.get(v)+sig.get(v)/sig.get(w)*(1+delta.get(w))); if(w!==s) CB.set(w, CB.get(w)+delta.get(w)); } }
+  const n=nodes.length, norm = n>2 ? 2/((n-1)*(n-2)) : 1; for(const [k,v] of CB) CB.set(k, v/2*norm); return CB; }
+
+const state = { fold:0, drift:!REDUCED, colour:'state', iso:null, land:true, grid:true, blocks:true, chain:true, relays:true, lattice:false, key:false, labels:true, glow:true, selected:null, auto:true, source:'—', k:1 };
+const DATA = { raw:null, nodes:[], byId:new Map(), N:32, model:null, models:[], boots:new Map(), edges:[], latticeEdges:[], blocks:[], top:[], bootStates:[], strata:[0,0,0,0,0,0,0], cb:new Map() };
+
+// ===== the contract, read the v1 page's way (labels + reach rule copied from kwaainet.html) =====
+const STATUS_LABELS = { online:'Serving', joining:'Idle', offline:'Departed', unreachable:'Unreachable', unannounced:'Unannounced' };
+function statusOf(wire, shardLoading){ if(wire==='online') return 'Serving'; if(wire==='joining' && shardLoading) return 'Loading'; return STATUS_LABELS[wire] || 'Unknown'; }
+function connOf(verdict, addrs, usingRelay){
+  if(verdict) return { direct:'Direct', punched:'NAT', relayed:'Relay', inbound: usingRelay ? 'Relay' : 'Direct' }[verdict] || 'Unknown';
+  if(Array.isArray(addrs) && addrs.length){ if(addrs.some(a => typeof a==='string' && a.includes('/p2p-circuit'))) return 'Relay'; return usingRelay ? 'NAT' : 'Direct'; }
+  if(usingRelay!=null) return usingRelay ? 'Relay' : 'Direct'; return 'Unknown'; }
+const tierOf = n => n>=5 ? 'Trusted' : n>=3 ? 'Verified' : n>=1 ? 'Known' : 'Unknown';   // MAP_SERVER_V2_REQUIREMENTS §4.1
+const relayOf = addrs => { for(const a of addrs||[]){ const m=/\/p2p\/([^/]+)\/p2p-circuit/.exec(a); if(m) return m[1]; } return null; };
+const hostOf = addrs => { for(const a of addrs||[]){ const m=/^\/(ip4|ip6|dns|dnsaddr|dns4|dns6)\/([^/]+)/.exec(a); if(m) return m[2]; } return null; };
+const nameOf = raw => (raw||'').replace(/\/v\d[\w.+-]*$/, '');
+const versionOf = raw => (raw||'').replace(/^[^-\/]*[-\/]/, '');
+function platformOf(name){ const os=[], arch=[], accel=[], host=[];
+  for(const t of (name||'').split('-').filter(Boolean)){ const l=t.toLowerCase();
+    if(/^(win|windows|macos|darwin|osx|linux|freebsd|nixos)$/.test(l)) os.push({win:'windows',darwin:'macos',osx:'macos'}[l]||l);
+    else if(/^(aarch64|arm64|x86_64|amd64|x64|riscv64)$/.test(l)) arch.push(l);
+    else if(/^(rtx|gtx|cuda|metal|mps|rocm|tpu|npu)$|^[ahl]\d{2,4}$|^(rtx|gtx)?\d{4}(ti|super)?$/.test(l)) accel.push(t);
+    else host.push(t); }
+  return { os:os.join(' '), arch:arch.join(' '), accel:accel.join('-'), host:host.join('-') }; }
+
+function ingest(raw){
+  DATA.raw = raw;
+  DATA.models = (raw.model_reports||[]).map(m => ({ name:m.name, short:m.short_name, blocks:m.num_blocks, state:m.state, rows:m.server_rows.length, repo:m.repository }));
+  DATA.model = DATA.models.slice().sort((a,b)=>b.blocks-a.blocks)[0] || null;
+  DATA.top = raw.top_contributors || []; DATA.bootStates = raw.bootstrap_states || [];
+  const extra = new Map();
+  for(const m of raw.model_reports||[]) for(const r of m.server_rows||[]){ const si=(r.span&&r.span.server_info)||{}; extra.set(r.peer_id, { model:m.short_name, modelName:m.name, si }); }
+  let rows;
+  if(Array.isArray(raw.peers) && raw.peers.length){
+    rows = raw.peers.map(p => ({ id:p.peer_id, short:p.short_peer_id, rawName:p.public_name, rawVersion:p.version, wire:p.state, shardLoading:!!p.shard_loading, model:p.model, span:p.span, throughput:p.throughput||0,
+      usingRelay:p.using_relay, vpk:p.vpk, attest:p.trust_attestations||0, ip:p.peer_ip_info||{}, kad:p.kad, announced:p.announced, v2:true }));
+  } else { rows=[];
+    for(const m of raw.model_reports||[]) for(const r of m.server_rows||[]){ const si=(r.span&&r.span.server_info)||{};
+      rows.push({ id:r.peer_id, short:r.short_peer_id, rawName:si.public_name, rawVersion:si.version, wire:r.state, shardLoading:!!si.shard_loading, model:m.short_name, span:r.span?{start:r.span.start,end:r.span.end}:null,
+        throughput:si.throughput||0, usingRelay:si.using_relay, vpk:si.vpk, attest:si.trust_attestations||0, ip:r.peer_ip_info||{}, kad:null, announced:true, v2:false }); } }
+  const topIdx = new Map(DATA.top.map((c,i)=>[c.peer_id,i]));
+  DATA.nodes = rows.map(r => { const x=extra.get(r.id)||{}; const si=x.si||{}; const loc=r.ip.location||{}; const addrs=r.ip.multiaddrs||[];
+    const status = statusOf(r.wire, r.shardLoading || si.shard_loading); const span = r.span && r.span.start!=null ? { start:r.span.start, end:r.span.end } : null;
+    const serving = status==='Serving' || status==='Loading'; const name = nameOf(r.rawName || si.public_name) || r.short || r.id.slice(-6);
+    const placed = loc.status==='success' && !(loc.lat===0 && loc.lon===0); const attest=+(r.attest || si.trust_attestations || 0);
+    return { id:r.id, short:r.short||'...'+r.id.slice(-6), name, rawName:r.rawName||si.public_name||'', version:versionOf(r.rawVersion||si.version)||'', rawVersion:r.rawVersion||si.version||'', wire:r.wire, status,
+      shardLoading:!!(r.shardLoading||si.shard_loading), model:r.model||x.model||null, span, blocks: span ? Math.max(0,span.end-span.start) : 0, serving, throughput:+(r.throughput||si.throughput||0),
+      usingRelay: r.usingRelay ?? si.using_relay ?? null, verdict:r.ip.reachability||null, connLabel: connOf(r.ip.reachability, addrs, r.usingRelay ?? si.using_relay), relay:relayOf(addrs), host:hostOf(addrs), addrs,
+      loc:{ ok:placed, country:loc.country||'', city:loc.city||'', lat:+loc.lat||0, lon:+loc.lon||0, isp:loc.isp||'', status:loc.status||'' },
+      place: placed ? [loc.city,loc.country].filter(Boolean).join(', ') : (loc.city==='Via relay' ? 'via relay · unplaced' : 'unplaced'),
+      vpk:r.vpk||si.vpk||null, attest, tier:tierOf(attest), kad:r.kad, announced:r.announced, dtype:si.torch_dtype||null, quant:si.quant_type||null, cache:si.cache_tokens_left ?? null,
+      rps:{ network:si.network_rps??null, forward:si.forward_rps??null, inference:si.inference_rps??null }, platform:platformOf(name), rank: topIdx.has(r.id)?topIdx.get(r.id)+1:null,
+      seam: serving && span ? (span.start===0 ? 'first' : 'hidden') : 'off', v2:r.v2 }; });
+  for(const n of DATA.nodes){ n.vertex = vertexOf(n); n.stratum = pc(n.vertex); }
+  DATA.byId = new Map(DATA.nodes.map(n=>[n.id,n]));
+  DATA.N = DATA.model ? DATA.model.blocks : Math.max(32, ...DATA.nodes.map(n=>n.span?n.span.end:0));
+  DATA.boots = new Map();
+  for(const n of DATA.nodes) if(n.relay){ const b=DATA.boots.get(n.relay)||{ id:n.relay, host:n.host, lat:null, lon:null, ok:false, behind:[] }; b.behind.push(n);
+    if(!b.ok && n.loc.status==='success' && n.loc.city==='Via relay' && !(n.loc.lat===0&&n.loc.lon===0)){ b.lat=n.loc.lat; b.lon=n.loc.lon; b.ok=true; b.isp=n.loc.isp.replace(/^Relay:\s*/,''); }
+    if(!b.host && n.host) b.host=n.host; DATA.boots.set(n.relay,b); }
+  DATA.blocks = Array.from({length:DATA.N}, (_,b)=>({ b, serving:[], loading:[] }));
+  for(const n of DATA.nodes) if(n.span) for(let b=Math.max(0,n.span.start); b<Math.min(DATA.N,n.span.end); b++){ if(n.status==='Serving') DATA.blocks[b].serving.push(n); else if(n.status==='Loading') DATA.blocks[b].loading.push(n); }
+  DATA.edges = []; const srv = DATA.nodes.filter(n=>n.status==='Serving' && n.span);
+  for(const a of srv) for(const b of srv) if(a!==b && a.span.start<b.span.start && b.span.start<=a.span.end && b.span.end>a.span.end) DATA.edges.push({ a, b, move:moveOf(a.vertex,b.vertex) });
+  DATA.latticeEdges = []; for(let i=0;i<DATA.nodes.length;i++) for(let j=i+1;j<DATA.nodes.length;j++){ const a=DATA.nodes[i], b=DATA.nodes[j]; if(pc(a.vertex^b.vertex)===1) DATA.latticeEdges.push({a,b,axis:AXES.find(ax=>ax.v===(a.vertex^b.vertex))}); }
+  DATA.strata = [0,0,0,0,0,0,0]; for(const n of DATA.nodes) DATA.strata[n.stratum]++;
+  const adj = new Map(DATA.nodes.map(n=>[n,new Set()])); for(const {a,b} of DATA.edges){ adj.get(a).add(b); adj.get(b).add(a); }
+  DATA.cb = betweenness(DATA.nodes, adj); for(const n of DATA.nodes) n.cb = DATA.cb.get(n)||0;
+}
+const netTerm = () => { const N0=Math.max(1,DATA.nodes.length); return Math.pow(1 + DATA.strata.reduce((s,n,i)=>s+W_STRATUM[i]*n/N0,0), state.k); };
+
+// ===== renderer / scene ==================================================================
+const canvas = $('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x05060d, 0.045);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100); camera.position.set(0, 1.3, 5.4);
+const world = new THREE.Group(); scene.add(world);
+const globeGroup=new THREE.Group(), chainGroup=new THREE.Group(), blockGroup=new THREE.Group(), nodeGroup=new THREE.Group(), edgeGroup=new THREE.Group(), relayGroup=new THREE.Group(), latticeGroup=new THREE.Group(), bootGroup=new THREE.Group(), labelGroup=new THREE.Group(), walkGroup=new THREE.Group();
+world.add(globeGroup, chainGroup, blockGroup, edgeGroup, relayGroup, latticeGroup, walkGroup, bootGroup, nodeGroup, labelGroup);
+latticeGroup.visible=false;
+const controls = new OrbitControls(camera, canvas); controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=2.4; controls.maxDistance=12;
+
+function glowTex(inner=0.28){ const cv=document.createElement('canvas'); cv.width=cv.height=128; const ctx=cv.getContext('2d'); const g=ctx.createRadialGradient(64,64,0,64,64,64);
+  g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(inner,'rgba(255,255,255,0.85)'); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,128,128); return new THREE.CanvasTexture(cv); }
+function ringTex(){ const cv=document.createElement('canvas'); cv.width=cv.height=128; const ctx=cv.getContext('2d'); ctx.strokeStyle='#fff'; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(64,64,52,0,TAU); ctx.stroke(); return new THREE.CanvasTexture(cv); }
+const GLOW=glowTex(), CORE=glowTex(0.6), RING=ringTex();
+const spriteMat = (tex, hex, op=1) => new THREE.SpriteMaterial({ map:tex, color:new THREE.Color(hex), transparent:true, opacity:op, depthWrite:false, blending:THREE.AdditiveBlending });
+
+const toSphere = (lat, lon, r, out) => { const la=lat*Math.PI/180, lo=lon*Math.PI/180; return out.set(r*Math.cos(la)*Math.cos(lo), r*Math.sin(la), -r*Math.cos(la)*Math.sin(lo)); };
+const bx = b => (b/DATA.N - 0.5)*AXIS_W;
+// three seatings, one dial: 0 globe · 1 chain · 2 star. Every object carries all three; the dial lerps between neighbours.
+const fChain = () => Math.max(0, Math.min(1, state.fold));
+const fStar  = () => Math.max(0, Math.min(1, state.fold-1));
+const seat = (d, out) => state.fold<=1 ? out.copy(d.globe).lerp(d.chain, ease(fChain())) : out.copy(d.chain).lerp(d.star||d.chain, ease(fStar()));
+// the star is /star's lattice in three dimensions: six icosahedral generators, vertex x = Σ (bit−½)·gen, scaled to radius R_STAR.
+// The k-th peer sharing a vertex steps outward along the vertex's own direction and a little around it.
+const R_STAR = 1.62, PHI_ = (1+Math.sqrt(5))/2;
+const KGEN = [[0,1,PHI_],[0,1,-PHI_],[1,PHI_,0],[1,-PHI_,0],[PHI_,0,1],[PHI_,0,-1]].map(v=>{ const L=Math.hypot(v[0],v[1],v[2]); return v.map(c=>c/L); });
+const KUNIT = (()=>{ const raw=[]; let mx=0; for(let x=0;x<64;x++){ const p=[0,0,0]; for(let b=0;b<6;b++){ const s=((x>>b)&1)-0.5; for(let i=0;i<3;i++) p[i]+=s*KGEN[b][i]; } raw.push(p); mx=Math.max(mx,Math.hypot(p[0],p[1],p[2])); } return raw.map(p=>p.map(c=>c/mx)); })();
+const starPos = (x, out, k=0) => { const u=KUNIT[x]; const L=Math.hypot(u[0],u[1],u[2])||1; const s=R_STAR*(1+0.09*k); out.set(u[0]*s, u[1]*s, u[2]*s); if(k) out.addScaledVector(new THREE.Vector3(-u[2]/L, 0.2, u[0]/L), 0.07*k); return out; };
+const tiltX = (v, a) => v.applyAxisAngle(new THREE.Vector3(1,0,0), a);
+
+let sphere, land, grat, chainGrid;
+{ sphere = new THREE.Mesh(new THREE.SphereGeometry(R*0.985, 48, 48), new THREE.MeshBasicMaterial({ color:new THREE.Color(PALETTE.cool), transparent:true, opacity:0.92 })); globeGroup.add(sphere);
+  const gl=[]; const G=new THREE.Vector3(), H=new THREE.Vector3();
+  for(let lat=-60; lat<=60; lat+=30) for(let lon=-180; lon<180; lon+=3){ toSphere(lat,lon,R*1.001,G); toSphere(lat,lon+3,R*1.001,H); gl.push(G.x,G.y,G.z,H.x,H.y,H.z); }
+  for(let lon=-180; lon<180; lon+=30) for(let lat=-90; lat<90; lat+=3){ toSphere(lat,lon,R*1.001,G); toSphere(lat+3,lon,R*1.001,H); gl.push(G.x,G.y,G.z,H.x,H.y,H.z); }
+  grat = new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(gl,3)), new THREE.LineBasicMaterial({ color:new THREE.Color(PALETTE.warm), transparent:true, opacity:0.07 })); globeGroup.add(grat);
+  land = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color:new THREE.Color(PALETTE.warm), transparent:true, opacity:0.30 })); globeGroup.add(land);
+  chainGrid = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color:0x8a92c5, transparent:true, opacity:0 })); chainGroup.add(chainGrid); }
+// ===== the star seating: 64 gems + ∂M — 96 edges = the succ cycle (64) + the half-turn chords x↔x+32 (32), 3-regular; /star's construction =====
+const starGroup = new THREE.Group(); world.add(starGroup); starGroup.visible=false;
+const STAR = { gems:[], edges:null };
+{ const geo=new THREE.IcosahedronGeometry(0.032,1); const p=new THREE.Vector3();
+  for(let x=0;x<64;x++){ const m=new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0 })); starPos(x,p); m.position.copy(p); m.userData={ kind:'vertex', x }; starGroup.add(m); STAR.gems.push(m); }
+  const pts=[]; const a=new THREE.Vector3(), b=new THREE.Vector3();
+  for(let x=0;x<64;x++){ starPos(x,a); starPos((x+1)&63,b); pts.push(a.x,a.y,a.z,b.x,b.y,b.z); }
+  for(let x=0;x<32;x++){ starPos(x,a); starPos(x+32,b); pts.push(a.x,a.y,a.z,b.x,b.y,b.z); }
+  STAR.edges = new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(pts,3)), new THREE.LineBasicMaterial({ color:new THREE.Color(PALETTE.warm), transparent:true, opacity:0, blending:THREE.AdditiveBlending })); starGroup.add(STAR.edges); }
+function paintStar(){ const s=ease(fStar()); const P = state.key ? KEYPAL : PALETTE; const C=new THREE.Color(P.cool), W=new THREE.Color(P.warm); const occ=new Map(); for(const n of DATA.nodes) occ.set(n.vertex,(occ.get(n.vertex)||0)+1);
+  for(const m of STAR.gems){ const x=m.userData.x; m.material.color.copy(C).lerp(W, 0.3+0.7*pc(x)/6); m.material.opacity = s*(occ.has(x)?1:0.45); m.scale.setScalar(occ.has(x)?1.5:1); }
+  if(state.key && KEYLIT.size){ const lc=new THREE.Color(KEYPAL.sword); for(const m of STAR.gems) if(KEYLIT.has(m.userData.x)){ m.material.color.copy(lc); m.material.opacity=s; m.scale.setScalar(1.7); } }
+  STAR.edges.material.opacity = 0.26*s; STAR.edges.material.color.set(P.warm); starGroup.visible = s>0.001; }
+
+// ===== the key layer — an imported City Key arrives as its own layer, in its own palette: /star's manifold around the
+// globe, the dual cores at the centre, the 64 inside with ∂M, its lit vertices burning. The globe keeps its own colours. =====
+const keyGroup = new THREE.Group(); world.add(keyGroup); keyGroup.visible=false;
+let KEYPAL = { ...CANON }, KEYGEO = { eps:0.35, m:5, n:6, core:0.60, smRatio:1.0 }, KEYLIT = new Set();
+const KEY = { built:false, cores:[], lat:null };
+// the same lattice as the star seating, scaled to sit inside the globe; it grows to the star's radius as the dial folds to the star
+const KVERTS = KUNIT.map(p=>p.map(c=>c*0.62));
+// /star's manifold: r(θ,φ) = R + ε·sin(mφ)·cos(nθ), as a wire
+function manifoldWire(RM, eps, m, n, segU=64, segV=40){ const pts=[]; const P=(u,v)=>{ const th=u*TAU, ph=v*Math.PI; const r=RM+eps*Math.sin(m*ph)*Math.cos(n*th); return [r*Math.sin(ph)*Math.cos(th), r*Math.cos(ph), -r*Math.sin(ph)*Math.sin(th)]; };
+  for(let i=0;i<=segV;i++) for(let j=0;j<segU;j++){ const a=P(j/segU,i/segV), b=P((j+1)/segU,i/segV); pts.push(...a,...b); if(i<segV){ const c=P(j/segU,(i+1)/segV); pts.push(...a,...c); } } return pts; }
+function buildKeyLayer(){ clearGroup(keyGroup); KEY.cores=[];
+  const cool=new THREE.Color(KEYPAL.cool), warm=new THREE.Color(KEYPAL.warm), sword=new THREE.Color(KEYPAL.sword), mage=new THREE.Color(KEYPAL.mage);
+  // the manifold: troughs in the key's mage, crests in its warm — a wire needs a lifted gradient to read on the dark
+  const RM=R*1.28, eps=RM*0.16*(KEYGEO.eps/0.35); const pts=manifoldWire(RM, eps, KEYGEO.m, KEYGEO.n); const col=[];
+  for(let i=0;i<pts.length;i+=3){ const r=Math.hypot(pts[i],pts[i+1],pts[i+2]); const t=Math.max(0,Math.min(1,(r-(RM-eps))/(2*eps||1))); const c=mage.clone().lerp(warm, t); col.push(c.r,c.g,c.b); }
+  const mg=new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); mg.setAttribute('color', new THREE.Float32BufferAttribute(col,3));
+  keyGroup.add(new THREE.LineSegments(mg, new THREE.LineBasicMaterial({ vertexColors:true, transparent:true, opacity:0.30, blending:THREE.AdditiveBlending, depthWrite:false })));
+  // the 64 inside, with ∂M, in a group that grows to the star seating as the dial folds
+  const lat=new THREE.Group(); KEY.lat=lat; keyGroup.add(lat);
+  const vp=[], vc=[]; for(let x=0;x<64;x++){ vp.push(...KVERTS[x]); const c=cool.clone().lerp(warm, 0.35+0.65*pc(x)/6); vc.push(c.r,c.g,c.b); }
+  const pg=new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.Float32BufferAttribute(vp,3)); pg.setAttribute('color', new THREE.Float32BufferAttribute(vc,3));
+  lat.add(new THREE.Points(pg, new THREE.PointsMaterial({ size:0.05, vertexColors:true, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, sizeAttenuation:true })));
+  const ep=[]; for(let x=0;x<64;x++) ep.push(...KVERTS[x], ...KVERTS[(x+1)&63]); for(let x=0;x<32;x++) ep.push(...KVERTS[x], ...KVERTS[x+32]);
+  lat.add(new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(ep,3)), new THREE.LineBasicMaterial({ color:warm, transparent:true, opacity:0.30, blending:THREE.AdditiveBlending, depthWrite:false })));
+  for(const x of KEYLIT){ const s=new THREE.Sprite(spriteMat(GLOW, KEYPAL.sword, 0.95)); s.scale.setScalar(0.16); s.position.set(KVERTS[x][0],KVERTS[x][1],KVERTS[x][2]); lat.add(s);
+    const r=new THREE.Sprite(new THREE.SpriteMaterial({ map:RING, color:new THREE.Color(KEYPAL.warm), transparent:true, opacity:0.8, depthWrite:false })); r.scale.setScalar(0.11); r.position.copy(s.position); lat.add(r); }
+  // the dual cores — two tetrahedra, Swordsman and Mage: the stella octangula at the centre
+  const TA=[[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]], TB=[[-1,-1,-1],[-1,1,1],[1,-1,1],[1,1,-1]], EDG=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  const sA=(KEYGEO.core*0.45)/Math.sqrt(3), sB=sA/(KEYGEO.smRatio||1);
+  for(const [bv,sc,c] of [[TA,sA,sword],[TB,sB,mage]]){ const e=[]; for(const [i,j] of EDG) e.push(bv[i][0]*sc,bv[i][1]*sc,bv[i][2]*sc, bv[j][0]*sc,bv[j][1]*sc,bv[j][2]*sc);
+    const L=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(e,3)), new THREE.LineBasicMaterial({ color:c, transparent:true, opacity:0.95, blending:THREE.AdditiveBlending, depthWrite:false })); keyGroup.add(L); KEY.cores.push(L);
+    const glow=new THREE.Sprite(spriteMat(GLOW, '#'+c.getHexString(), 0.45)); glow.scale.setScalar(0.5); keyGroup.add(glow); }
+  KEY.built=true; keyGroup.visible=state.key; }
+async function loadLand(){ try{ const j=await (await fetch('data/land.json')).json(); const pts=[]; const A=new THREE.Vector3(), B=new THREE.Vector3();
+  for(const arc of j.arcs) for(let i=1;i<arc.length;i++){ toSphere(arc[i-1][1],arc[i-1][0],R*1.004,A); toSphere(arc[i][1],arc[i][0],R*1.004,B); pts.push(A.x,A.y,A.z,B.x,B.y,B.z); }
+  land.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); }catch(e){ console.warn('land.json missing — globe runs bare', e); } }
+function rebuildChainGrid(){ const pts=[]; for(let b=0;b<=DATA.N;b++){ const x=bx(b); pts.push(x,-1.45,0, x,1.75,0); } pts.push(bx(0),-1.25,0, bx(DATA.N),-1.25,0); chainGrid.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); }
+
+const OBJ = { nodes:[], blocks:[], boots:[], spans:null, edgesV:null, edgesL:null, edgesJ:null, edgesDim:null, relays:null, lattice:null, walk:null, sel:null };
+function clearGroup(g){ while(g.children.length){ const c=g.children.pop(); c.geometry&&c.geometry.dispose&&c.geometry.dispose(); if(c.material&&c.material.map&&![GLOW,CORE,RING].includes(c.material.map)) c.material.map.dispose(); c.material&&c.material.dispose&&c.material.dispose(); } }
+function labelSprite(text, hex){ const cv=document.createElement('canvas'); const ctx=cv.getContext('2d'); const font="500 26px 'Spline Sans Mono', monospace";
+  ctx.font=font; const w=Math.ceil(ctx.measureText(text).width)+24; cv.width=Math.max(64,w); cv.height=40; ctx.font=font; ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(4,5,11,0.55)'; ctx.fillRect(0,0,cv.width,cv.height); ctx.fillStyle=hex; ctx.fillText(text,12,21);
+  const tex=new THREE.CanvasTexture(cv); tex.minFilter=THREE.LinearFilter; const spr=new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, opacity:0.88, depthWrite:false }));
+  spr.scale.set(cv.width/560, cv.height/560, 1); return spr; }
+
+function layout(){
+  for(const g of [nodeGroup,labelGroup,blockGroup,bootGroup,edgeGroup,relayGroup,latticeGroup,walkGroup,chainGroup]) clearGroup(g);
+  chainGroup.add(chainGrid); rebuildChainGrid(); OBJ.nodes=[]; OBJ.blocks=[]; OBJ.boots=[];
+  const laned = DATA.nodes.filter(n=>n.span).sort((a,b)=>a.span.start-b.span.start || b.blocks-a.blocks);
+  const laneEnd=[]; for(const n of laned){ let l=laneEnd.findIndex(e=>e<=n.span.start); if(l<0){ l=laneEnd.length; laneEnd.push(0); } laneEnd[l]=n.span.end; n.lane=l; }
+  const unlaned = DATA.nodes.filter(n=>!n.span), unplaced = DATA.nodes.filter(n=>!n.loc.ok); const atV=new Map();
+  DATA.nodes.forEach(n => { const globe=new THREE.Vector3(), chain=new THREE.Vector3(), star=new THREE.Vector3();
+    const k=atV.get(n.vertex)||0; atV.set(n.vertex,k+1); starPos(n.vertex, star, k); n.fan=k;
+    if(n.loc.ok) toSphere(n.loc.lat, n.loc.lon, R*1.03 + 0.02*Math.min(1,n.throughput/30), globe);
+    else { const k=unplaced.indexOf(n), a=(k/Math.max(1,unplaced.length))*TAU+0.4; globe.set(R*1.34*Math.cos(a), 0, R*1.34*Math.sin(a)); tiltX(globe, 0.55); }
+    if(n.span) chain.set(bx((n.span.start+n.span.end)/2), -0.9+n.lane*0.24, 0.02); else { const k=unlaned.indexOf(n); chain.set(bx(DATA.N*(k+0.5)/Math.max(1,unlaned.length)), 1.45, 0.02); }
+    const base = 0.10 + 0.07*Math.min(1, n.throughput/30);
+    const halo=new THREE.Sprite(spriteMat(GLOW,'#ffffff')); halo.scale.setScalar(base);
+    const core=new THREE.Sprite(spriteMat(CORE,'#e8edff')); core.scale.setScalar(base*0.28);
+    const ring=new THREE.Sprite(new THREE.SpriteMaterial({ map:RING, color:new THREE.Color(PAL.eve), transparent:true, opacity:0.9, depthWrite:false })); ring.scale.setScalar(base*1.5); ring.visible=!!n.vpk;
+    halo.userData={ node:n, globe, chain, star, base, core, ring, kind:'node' }; nodeGroup.add(halo, core, ring); OBJ.nodes.push(halo);
+    const lab=labelSprite(n.name, PALETTE.warm); labelGroup.add(lab); halo.userData.label=lab; });
+  const geo=new THREE.IcosahedronGeometry(0.03,1);
+  for(const blk of DATA.blocks){ const a=blk.b/DATA.N*TAU; const globe=new THREE.Vector3(R*1.52*Math.cos(a),0,R*1.52*Math.sin(a)); tiltX(globe,-0.34); const chain=new THREE.Vector3(bx(blk.b+0.5),-1.25,0);
+    const star=new THREE.Vector3(0.95*Math.cos(a), 0, 0.95*Math.sin(a));   // the blocks ring the star's equator
+    const m=new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.9 })); m.userData={ block:blk, globe, chain, star, kind:'block' }; blockGroup.add(m); OBJ.blocks.push(m); }
+  let bi=0; for(const b of DATA.boots.values()){ const globe=new THREE.Vector3(); if(b.ok) toSphere(b.lat,b.lon,R*1.07,globe); else globe.set(0,(bi%2?-1:1)*R*1.25,0); const chain=new THREE.Vector3(-1.9+bi*3.8,1.75,0.02); const star=new THREE.Vector3(0,(bi%2?-1:1)*2.2,0.02);
+    const m=new THREE.Mesh(new THREE.OctahedronGeometry(0.05), new THREE.MeshBasicMaterial({ color:new THREE.Color(PAL.boot), transparent:true, opacity:0.95 })); const glow=new THREE.Sprite(spriteMat(GLOW,PAL.boot,0.5)); glow.scale.setScalar(0.22);
+    m.userData={ boot:b, globe, chain, star, kind:'boot', glow }; bootGroup.add(m,glow); OBJ.boots.push(m); bi++; }
+  OBJ.spans = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ transparent:true, opacity:0, vertexColors:true })); chainGroup.add(OBJ.spans);
+  const edgeMat = (hex, op) => new THREE.LineBasicMaterial({ color:new THREE.Color(hex), transparent:true, opacity:op, blending:THREE.AdditiveBlending });
+  OBJ.edgesV=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat(PALETTE.mage,0.34)); OBJ.edgesL=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat('#8B5CF6',0.34));
+  OBJ.edgesJ=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat('#7c86b8',0.22)); OBJ.edgesDim=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat(PALETTE.mage,0.05));
+  edgeGroup.add(OBJ.edgesV, OBJ.edgesL, OBJ.edgesJ, OBJ.edgesDim);
+  OBJ.relays=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat('#8b5cf6',0.22)); relayGroup.add(OBJ.relays);
+  OBJ.lattice=new THREE.LineSegments(new THREE.BufferGeometry(), edgeMat(PALETTE.warm,0.16)); latticeGroup.add(OBJ.lattice);
+  OBJ.walk=new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color:new THREE.Color(PALETTE.sword), transparent:true, opacity:0.9 })); walkGroup.add(OBJ.walk);
+  OBJ.sel=new THREE.Sprite(new THREE.SpriteMaterial({ map:RING, color:new THREE.Color(PALETTE.sword), transparent:true, opacity:0.95, depthWrite:false })); OBJ.sel.visible=false; nodeGroup.add(OBJ.sel);
+  rebuildAll(); applyColours(); applyIso(); rebuildWalk();
+}
+const _m=new THREE.Vector3();
+function rebuildAll(){ const f=ease(state.fold);
+  for(const s of OBJ.nodes){ const d=s.userData; seat(d,s.position); d.core.position.copy(s.position); d.ring.position.copy(s.position); d.label.position.copy(s.position); d.label.position.y += d.base*0.75+0.03; }
+  for(const m of OBJ.blocks) seat(m.userData, m.position);
+  for(const m of OBJ.boots){ seat(m.userData, m.position); m.userData.glow.position.copy(m.position); }
+  const g=1-ease(fChain()), c=ease(fChain())*(1-ease(fStar()));   // globe fades out over 0→1; the chain furniture peaks at 1 and fades toward the star
+  const keyOn = state.key && KEY.built, sf=ease(fStar()); keyGroup.visible = keyOn && (g>0.15 || sf>0.15);   // the key layer lives on the globe and on the star, not on the chain
+  if(KEY.lat){ KEY.lat.scale.setScalar(1 + (R_STAR/0.62 - 1)*sf); KEY.lat.visible = sf<0.5; }             // the inner 64 grow into the star seating, then the star's own gems take over
+  const KP = keyOn ? KEYPAL : PALETTE; sphere.material.color.set(KP.cool); land.material.color.set(KP.warm); grat.material.color.set(KP.warm);
+  sphere.material.opacity=0.92*g*(keyOn?0.45:1); land.material.opacity=0.30*g*(keyOn?0.55:1); grat.material.opacity=0.07*g; sphere.visible=g>0.001; chainGrid.material.opacity=0.09*c;
+  const sp=[], sc=[]; for(const s of OBJ.nodes){ const n=s.userData.node; if(!n.span) continue; const y=s.userData.chain.y; const cc=new THREE.Color(colourOf(n)); sp.push(bx(n.span.start),y,0.01, bx(n.span.end),y,0.01); sc.push(cc.r,cc.g,cc.b,cc.r,cc.g,cc.b); }
+  OBJ.spans.geometry.setAttribute('position', new THREE.Float32BufferAttribute(sp,3)); OBJ.spans.geometry.setAttribute('color', new THREE.Float32BufferAttribute(sc,3)); OBJ.spans.material.opacity=0.7*c;
+  paintStar(); rebuildEdges(); rebuildRelays(); rebuildLattice(); rebuildWalkLine();
+  if(state.selected){ const s=objOf(state.selected); if(s) OBJ.sel.position.copy(s.position); } }
+function arc(from, to, out, lift){ const f = state.fold<=1 ? ease(fChain()) : 1, SEG=10;   // arcs lift radially on the globe, straight up off the chain and the star
+  for(let i=0;i<SEG;i++) for(const t of [i/SEG,(i+1)/SEG]){ _m.lerpVectors(from,to,t); const bump=lift*Math.sin(Math.PI*t); const len=_m.length()||1; _m.multiplyScalar((len+bump*(1-f))/len); _m.z+=bump*f; out.push(_m.x,_m.y,_m.z); } }
+const byNode = () => new Map(OBJ.nodes.map(s=>[s.userData.node,s]));
+function rebuildEdges(){ const V=[], L=[], J=[], dim=[]; const by=byNode();
+  for(const {a,b,move} of DATA.edges){ const A=by.get(a), B=by.get(b); if(!A||!B) continue;
+    const on = visibleFor(a) && visibleFor(b) && (!state.selected || a.id===state.selected || b.id===state.selected);
+    if(!on){ arc(A.position,B.position,dim,0.22); continue; }
+    arc(A.position,B.position, state.colour==='model' ? (move.cls==='vertical'?V:move.cls==='lateral'?L:J) : V, 0.22); }
+  OBJ.edgesV.geometry.setAttribute('position', new THREE.Float32BufferAttribute(V,3)); OBJ.edgesL.geometry.setAttribute('position', new THREE.Float32BufferAttribute(L,3));
+  OBJ.edgesJ.geometry.setAttribute('position', new THREE.Float32BufferAttribute(J,3)); OBJ.edgesDim.geometry.setAttribute('position', new THREE.Float32BufferAttribute(dim,3)); }
+function rebuildRelays(){ const pts=[]; const boot=new Map(OBJ.boots.map(m=>[m.userData.boot.id,m]));
+  for(const s of OBJ.nodes){ const n=s.userData.node; if(!n.relay) continue; const b=boot.get(n.relay); if(!b||!visibleFor(n)) continue; arc(s.position,b.position,pts,0.12); }
+  OBJ.relays.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); }
+function rebuildLattice(){ const pts=[]; const by=byNode(); for(const {a,b} of DATA.latticeEdges){ const A=by.get(a), B=by.get(b); if(!A||!B||!visibleFor(a)||!visibleFor(b)) continue; arc(A.position,B.position,pts,0.3); }
+  OBJ.lattice.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); }
+const objOf = id => OBJ.nodes.find(s=>s.userData.node.id===id);
+
+// ===== colour + isolation =================================================================
+function colourOf(n){ switch(state.colour){
+  case 'conn': return PAL.conn[n.connLabel]||PAL.conn.Unknown; case 'tier': return PAL.tier[n.tier];
+  case 'seam': return n.seam==='first' ? PALETTE.sword : n.seam==='hidden' ? PALETTE.mage : '#3a4160';
+  case 'model': { const P = state.key ? KEYPAL : PALETTE; return '#'+new THREE.Color(P.cool).lerp(new THREE.Color(P.warm), 0.3+0.7*n.stratum/6).getHexString(); }
+  default: return PAL.state[n.status]||PAL.state.Unknown; } }
+function applyColours(){ for(const s of OBJ.nodes){ const n=s.userData.node; s.material.color.set(colourOf(n)); s.userData.core.material.color.set(n.status==='Departed'?'#8a93b8':'#f4f6ff'); }
+  for(const m of OBJ.blocks){ const b=m.userData.block; m.material.color.set(b.serving.length>=2?PAL.cover.many:b.serving.length===1?PAL.cover.one:(b.loading.length?'#3B82F6':PAL.cover.none)); }
+  renderCoverage(); if(OBJ.spans) rebuildAll(); }
+function visibleFor(n){ const iso=state.iso; if(!iso) return true;
+  if(iso.kind==='state') return n.status===iso.key; if(iso.kind==='conn') return n.connLabel===iso.key; if(iso.kind==='tier') return n.tier===iso.key; if(iso.kind==='seam') return n.seam===iso.key;
+  if(iso.kind==='stratum') return n.stratum===iso.key; if(iso.kind==='lit') return iso.key.has(n.vertex);
+  if(iso.kind==='block') return !!n.span && n.span.start<=iso.key && iso.key<n.span.end && n.serving; return true; }
+function applyIso(){ for(const s of OBJ.nodes){ const n=s.userData.node; const on=visibleFor(n), dep=n.status==='Departed';
+    s.material.opacity = on?(dep?0.55:1):0.10; s.userData.core.material.opacity=on?1:0.12; s.userData.ring.material.opacity=on?0.9:0.1; s.userData.label.visible=state.labels&&on; }
+  document.querySelectorAll('.chip').forEach(c=>{ const k=c.dataset.kind, v=c.dataset.key; const isoOn=state.iso&&state.iso.kind===k; c.classList.toggle('iso', !!(state.iso&&state.iso.kind===k&&String(state.iso.key)===v)); c.classList.toggle('dim', !!(isoOn&&String(state.iso.key)!==v)); });
+  document.querySelectorAll('#covBar .c').forEach(c=>{ c.classList.toggle('iso', !!(state.iso&&state.iso.kind==='block'&&state.iso.key===+c.dataset.b)); });
+  rebuildEdges(); rebuildRelays(); rebuildLattice(); renderTable(); }
+function setIso(kind,key){ state.iso = (state.iso&&state.iso.kind===kind&&state.iso.key===key) ? null : {kind,key}; applyIso(); }
+
+// ===== HUD ==============================================================================
+function renderStatus(){ const raw=DATA.raw; if(!raw) return;
+  const serving=DATA.nodes.filter(n=>n.status==='Serving').length, tps=DATA.nodes.filter(n=>n.status==='Serving').reduce((a,n)=>a+n.throughput,0), bootsOn=DATA.bootStates.filter(s=>s==='online').length;
+  const t = raw.last_updated ? new Date(raw.last_updated).toISOString().slice(11,19)+'Z' : '?';
+  const held = raw.stale_since ? ` · <span class="src baked">held since ${esc(String(raw.stale_since).slice(0,19))}Z</span>` : '';
+  $('status').innerHTML = `<b>${DATA.nodes.length}</b> peers · <b>${serving}</b> serving · <b>${raw.num_blocks_covered ?? DATA.blocks.filter(b=>b.serving.length).length}</b>/${DATA.N} blocks · <b>${bootsOn}</b>/${DATA.bootStates.length} bootstraps · <b>${tps.toFixed(1)}</b> tok/s · network term <b>${netTerm().toFixed(2)}</b>`
+    + `<br>crawled <b>${t}</b> in ${(+raw.update_duration||0).toFixed(1)} s, every ${raw.update_period||'?'} s · <span class="src ${state.source==='baked'?'baked':''}">${esc(state.source)}</span>${held}`;
+  $('srcline').innerHTML = (state.source==='baked' ? `source: <b>baked snapshot</b> (site/data/state.json${raw._baked?', baked '+esc(String(raw._baked.at).slice(0,19))+'Z':''}) — the live seam did not answer` : `source: <b>${esc(state.source)}</b> — /api/v1/state, read ${new Date().toISOString().slice(11,19)}Z`)
+    + `<br>models: ${DATA.models.map(m=>`<b>${esc(m.short)}</b> ${m.blocks} blocks · ${esc(m.state)} · ${m.rows} rows`).join(' · ')||'none registered'}`; }
+function chipGroup(box, kind, keys, pal, why){ box.innerHTML='';
+  for(const k of keys){ const count=DATA.nodes.filter(n=>kind==='state'?n.status===k:kind==='conn'?n.connLabel===k:n.tier===k).length; if(!count && !['Serving','Loading','Idle'].includes(k) && kind!=='tier') continue;
+    const el=document.createElement('div'); el.className='chip'; el.style.color=pal[k]; el.dataset.kind=kind; el.dataset.key=k; el.innerHTML=`<span class="gem"></span><span class="nm">${k}<span>${why[k]||''}</span></span><span class="ct">${count}</span>`; el.onclick=()=>setIso(kind,k); box.appendChild(el); } }
+function renderLegend(){ chipGroup($('chipsState'),'state',STATE_ORDER,PAL.state,STATE_WHY); chipGroup($('chipsConn'),'conn',['Direct','NAT','Relay','Unknown'],PAL.conn,CONN_WHY); chipGroup($('chipsTier'),'tier',['Trusted','Verified','Known','Unknown'],PAL.tier,TIER_WHY); }
+function renderCoverage(){ const bar=$('covBar'); bar.innerHTML=''; $('covModel').textContent = DATA.model ? `${DATA.model.short} · ${DATA.N} blocks` : `${DATA.N} blocks`;
+  for(const b of DATA.blocks){ const c=document.createElement('div'); c.className='c'; c.dataset.b=b.b; const col=b.serving.length>=2?PAL.cover.many:b.serving.length===1?PAL.cover.one:(b.loading.length?'#3B82F6':PAL.cover.none);
+    c.style.background=col; c.style.color=col; c.style.opacity=b.serving.length?Math.min(1,0.45+0.2*b.serving.length):0.7;
+    c.onmouseenter=()=>{ tip.innerHTML=`<b>block ${b.b}</b><br><span class="m">${b.serving.length} serving${b.serving.length?': '+b.serving.map(n=>esc(n.name)).join(', '):''}${b.loading.length?'<br>'+b.loading.length+' loading: '+b.loading.map(n=>esc(n.name)).join(', '):''}</span>`; tip.style.display='block'; };
+    c.onmouseleave=()=>{ tip.style.display='none'; }; c.onclick=()=>setIso('block',b.b); bar.appendChild(c); }
+  const covered=DATA.blocks.filter(b=>b.serving.length).length, thin=DATA.blocks.filter(b=>b.serving.length===1).length, gaps=DATA.N-covered;
+  $('covL').textContent='block 0'; $('covR').textContent='block '+(DATA.N-1); $('covM').innerHTML=`<b>${covered}</b>/${DATA.N} covered · <b>${thin}</b> single-server · <b>${gaps}</b> gap${gaps===1?'':'s'}`;
+  $('covMini').textContent=`block coverage · ${DATA.model?DATA.model.short+' · ':''}${covered}/${DATA.N} covered · ${gaps} gap${gaps===1?'':'s'}${OBS.on?' · recording':''}`; paintCovMin(); }
+// the coverage panel folds to its glyph; the fold is remembered
+function paintCovMin(){ const cov=$('coverage'), b=$('zCov'); const hidden=cov.classList.contains('min'); const rec = typeof OBS!=='undefined' && OBS.on;   // OBS is declared further down the module
+  b.classList.toggle('on', !hidden); b.classList.toggle('rec', hidden && rec);
+  b.title = ($('covMini').textContent||'block coverage') + (hidden ? ' — click to show' : ' — click to hide'); }
+{ const CMKEY='kwaai-map-cov-min'; const cov=$('coverage'); const setMin=on=>{ cov.classList.toggle('min',on); paintCovMin(); try{ localStorage.setItem(CMKEY,on?'1':''); }catch(e){} if(!on && typeof renderRecorder==='function') renderRecorder(); };
+  $('zCov').onclick=()=>setMin(!cov.classList.contains('min')); let m=false; try{ m=localStorage.getItem(CMKEY)==='1'; }catch(e){}
+  if(m) setTimeout(()=>setMin(true), 0);   // after the whole module has evaluated: a remembered fold must not run ahead of the declarations it reads
+}
+let sortKey='throughput', sortDir=-1;
+function renderTable(){ const tb=$('tBody'); if(!tb) return; const rows=DATA.nodes.slice().sort((a,b)=>{ let x=a[sortKey], y=b[sortKey]; if(typeof x==='string') return x.localeCompare(y)*sortDir; return ((x||0)-(y||0))*sortDir; });
+  tb.innerHTML = rows.map(n=>`<tr class="r ${n.id===state.selected?'sel':''}" data-id="${esc(n.id)}" style="${visibleFor(n)?'':'opacity:0.35'}"><td title="${esc(n.rawName)}"><span class="dot" style="color:${colourOf(n)}"></span>${esc(n.name)}</td><td style="color:${PAL.state[n.status]}">${n.status}</td><td class="num">${n.span?`${n.span.start}–${n.span.end}`:'—'}</td><td class="num">${n.throughput?n.throughput.toFixed(1):'—'}</td><td class="num" title="${b6(n.vertex)} · stratum ${n.stratum}">${n.vertex}</td><td title="${esc(n.place)}">${esc(n.place)}</td></tr>`).join('');
+  tb.querySelectorAll('tr').forEach(tr=>{ tr.onclick=()=>select(tr.dataset.id,true); }); document.querySelectorAll('#tHead th').forEach(th=>th.classList.toggle('on', th.dataset.k===sortKey)); }
+document.querySelectorAll('#tHead th').forEach(th=>{ th.onclick=()=>{ if(sortKey===th.dataset.k) sortDir=-sortDir; else { sortKey=th.dataset.k; sortDir=['throughput','blocks','vertex'].includes(sortKey)?-1:1; } renderTable(); }; });
+function renderFind(){ const q=$('findQ').value.trim().toLowerCase(); const box=$('findList');
+  const hits = q ? DATA.nodes.filter(n=>[n.name,n.rawName,n.id,n.place,n.version,n.model,n.status,n.connLabel,n.loc.isp,'v'+n.vertex].some(v=>String(v||'').toLowerCase().includes(q))) : DATA.nodes.slice().sort((a,b)=>b.throughput-a.throughput);
+  box.innerHTML = hits.slice(0,40).map(n=>`<div class="frow" data-id="${esc(n.id)}" style="color:${colourOf(n)}"><span class="d"></span><span class="t">${esc(n.name)}</span><span class="m">${n.status} · ${n.span?n.span.start+'–'+n.span.end:'no range'} · V${n.vertex} · ${esc(n.place)}</span></div>`).join('') || '<div class="hint">nothing matches</div>';
+  box.querySelectorAll('.frow').forEach(r=>{ r.onclick=()=>select(r.dataset.id,true); }); }
+$('findQ').addEventListener('input', renderFind);
+function renderModel(){
+  $('axisTable').innerHTML = AXES.map(a=>{ const c=DATA.nodes.filter(a.rule).length; return `<tr><td style="white-space:nowrap">${a.e} <b>${a.id}</b> · ${a.v}</td><td>${esc(a.why)}</td><td class="n">${c}</td></tr>`; }).join('');
+  $('strataTable').innerHTML = DATA.strata.map((n,i)=>`<tr><td><b>stratum ${i}</b> · ${i} of 6 held</td><td class="n">w ${W_STRATUM[i]}</td><td class="n"><span class="chip" data-kind="stratum" data-key="${i}" style="display:inline;padding:1px 6px;color:#7fe8d8">${n} peer${n===1?'':'s'}</span></td></tr>`).join('');
+  $('strataTable').querySelectorAll('.chip').forEach(c=>{ c.onclick=()=>setIso('stratum',+c.dataset.key); });
+  $('netTerm').textContent = netTerm().toFixed(3); $('kV').textContent=state.k.toFixed(2);
+  const top = DATA.nodes.filter(n=>n.cb>0).sort((a,b)=>b.cb-a.cb).slice(0,6);
+  $('cbList').innerHTML = top.map(n=>`<div class="frow" data-id="${esc(n.id)}" style="color:${colourOf(n)}"><span class="d"></span><span class="t">${esc(n.name)}</span><span class="m">C_B ${n.cb.toFixed(3)} · V${n.vertex}</span></div>`).join('') || '<div class="hint">no chain has two threads yet — nothing to cross</div>';
+  $('cbList').querySelectorAll('.frow').forEach(r=>{ r.onclick=()=>select(r.dataset.id,true); }); }
+$('kSlider').addEventListener('input', ()=>{ state.k=+$('kSlider').value; $('kV').textContent=state.k.toFixed(2); $('netTerm').textContent=netTerm().toFixed(3); renderStatus(); });
+
+// ===== doors — the pages this map connects to, checked 2026-09-27 =====================
+const DOORS = {
+  net: [ ['https://map.kwaai.ai/','map.kwaai.ai','the deployed map',true], ['https://map.kwaai.ai/api/v1/state','/api/v1/state','the document this page reads',true], ['https://map.kwaai.ai/metrics','/metrics','Prometheus text',true],
+    ['https://map.kwaai.ai/api/prometheus','/api/prometheus','same, v1 path',true], ['https://map.kwaai.ai/api/v1/is_reachable/','/api/v1/is_reachable/<peer>','live probe · use the card',true] ],
+  local: [ ['http://localhost:11435/v1/models','OpenAI-compatible API · :11435','kwaainet start — /v1/models, /v1/chat/completions'], ['http://localhost:8080/','shard API · :8080','kwaainet shard api (config port)'],
+    ['http://localhost:9090/','RAG server + web UI · :9090','kwaainet rag serve'], ['http://127.0.0.1:5173/','node dashboard · :5173','start-ui (frontend; backend :3456)'], ['http://127.0.0.1:3456/api/status','dashboard API · :3456','status · config · logs · identity · network'],
+    ['http://127.0.0.1:7432/','VPK operator console · :7432','local only, storage'], ['http://localhost:11434/api/tags','Ollama · :11434','model provider the node can use'] ],
+  src: [ ['https://github.com/Kwaai-AI-Lab/KwaaiNet','KwaaiNet','the node, the CLI, the docs',true], ['https://github.com/Kwaai-AI-Lab/KwaaiNetMap','KwaaiNetMap','this map’s home: v1 page + v2 server',true], ['https://github.com/Kwaai-AI-Lab/KwaaiNet/releases/latest','latest release','installers',true],
+    ['https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/getting-started-node.md','getting started: run a node','',true], ['https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/api-quickstart.md','API quickstart','',true],
+    ['https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/DEBUGGING_MAP_VISIBILITY.md','why a node does not appear on the map','',true], ['https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/NODE_UI_PLANNING.md','node dashboard plan','',true],
+    ['https://github.com/Kwaai-AI-Lab/KwaaiNetGUI','KwaaiNetGUI','',null], ['https://github.com/Kwaai-AI-Lab/KwaaiNetDashboard','KwaaiNetDashboard','',null],
+    ['https://www.kwaai.ai/kwaainet','kwaai.ai/kwaainet','whitepapers',true], ['https://trustoverip.org/','Trust over IP','the trust stack',true], ['https://glianetalliance.org/#pledge','GliaNet fiduciary pledge','the /pledge path moved; the pledge is a section of the home page',true] ],
+  star: [ ['https://github.com/mitchuski/vpk_kwaai_mage','vpk_kwaai_mage','the lane behind the seam lens',true], ['https://github.com/mitchuski/star-key','star-key','the browser extension + City Key reader',true], ['https://soulbis.com/guide','soulbis /guide','how the key works',true],
+    ['https://soulbis.com/lattice','soulbis /lattice','import a key, walk the 64',true], ['https://soulbis.com/star','soulbis /star','the manifold',true], ['https://soulbis.com/skye','soulbis /skye','the night of many keys',true],
+    ['https://guide.agentprivacy.ai/star-chart/','guide star chart','the instrument this page is built like',true], ['https://mages.city/','mages.city','the agentland',true] ],
+};
+function renderDoors(){ const row=(d,st,m)=>`<div class="door"><span class="st ${st}"></span><a href="${esc(d[0])}" target="_blank" rel="noreferrer">${esc(d[1])}</a><span class="m">${esc(m||d[2])}</span></div>`;
+  $('doorsNet').innerHTML = DOORS.net.map(d=>row(d,'ok')).join('');
+  $('doorsLocal').innerHTML = DOORS.local.map(d=>row(d,'','')).join('') + `<div class="hint">none of these is public: they answer only on the machine running the node. Probe tries each from this page (no-cors, 2 s).</div>`;
+  $('doorsSrc').innerHTML = DOORS.src.map(d=>row(d, d[3]===true?'ok':d[3]===false?'no':'q')).join('') + `<div class="hint">● answered on 2026-09-27 · ◐ unchecked. <b>KwaaiNetOps</b>, named in V2.md as the deploy owner, is not a public repository, so it is not linked.</div>`;
+  $('doorsStar').innerHTML = DOORS.star.map(d=>row(d,'ok')).join('');
+  document.querySelectorAll('#doorsNet .door a')[4].href = 'https://map.kwaai.ai/api/v1/is_reachable/' + (state.selected||''); }
+$('probeLocal').onclick = async () => { const rows=[...document.querySelectorAll('#doorsLocal .door')];
+  await Promise.all(DOORS.local.map(async (d,i)=>{ const st=rows[i].querySelector('.st'); st.className='st q'; const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),2000);
+    try{ await fetch(d[0], { mode:'no-cors', signal:ctl.signal, cache:'no-store' }); st.className='st ok'; rows[i].querySelector('.m').textContent='answers'; } catch(e){ st.className='st no'; rows[i].querySelector('.m').textContent='silent'; } finally{ clearTimeout(t); } })); };
+function renderAbout(){
+  $('top5').innerHTML = DATA.top.map((c,i)=>{ const n=DATA.byId.get(c.peer_id); return `<div class="frow" data-id="${esc(c.peer_id)}" style="color:${n?colourOf(n):'#7c86b8'}"><span class="d"></span><span class="t">${i+1} · ${esc(nameOf(c.public_name)||c.peer_id.slice(-6))}</span><span class="m">${(+c.throughput).toFixed(1)} tok/s · ${c.blocks} blocks</span></div>`; }).join('') || '<div class="hint">none published</div>';
+  $('top5').querySelectorAll('.frow').forEach(r=>{ r.onclick=()=>select(r.dataset.id,true); });
+  const bs=DATA.bootStates.map((s,i)=>`<span style="color:${s==='online'?'#9ff0d4':'#ff9d9d'}">● bootstrap ${i+1} ${s}</span>`).join(' · ');
+  $('boots').innerHTML = `<div class="hint" style="margin-top:0">${bs||'no bootstrap states'}</div>` + [...DATA.boots.values()].map(b=>`<div class="hint"><b>${esc(b.host||'?')}</b> · …${esc(b.id.slice(-6))} · ${b.ok?esc([b.isp,b.lat.toFixed(2)+', '+b.lon.toFixed(2)].filter(Boolean).join(' · ')):'unplaced'} · <b>${b.behind.length}</b> peer${b.behind.length===1?'':'s'} behind it</div>`).join('');
+  const first=DATA.nodes.filter(n=>n.seam==='first'), hid=DATA.nodes.filter(n=>n.seam==='hidden'), eve=DATA.nodes.filter(n=>n.vpk); const gb=eve.reduce((a,n)=>a+(+(n.vpk&&n.vpk.capacity_gb)||0),0);
+  $('seamStats').innerHTML = `right now: <b>${first.length}</b> first-block server${first.length===1?'':'s'} (${first.map(n=>esc(n.name)).join(', ')||'none'}) · <b>${hid.length}</b> hidden-state · <b>${eve.length}</b> VPK Eve host${eve.length===1?'':'s'}${eve.length?' · '+gb.toFixed(0)+' GB offered':''}`;
+  renderDoors(); renderModel(); }
+
+// ===== the node card =========================================================================
+const yes = v => v===true ? '<span class="ok">yes</span>' : v===false ? '<span class="no">no</span>' : '<i>not in this document</i>';
+const kv = (k,v) => `<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+const cp = (txt,label='copy') => `<button class="cp" data-cp="${esc(txt)}">${label}</button>`;
+const bitsHtml = x => `<span class="bits">${AXES.map(a=>`<i class="${x&a.v?'on':''}" title="${a.id}">${a.e}</i>`).join('')}</span>`;
+const namesAt = v => DATA.nodes.filter(n=>n.vertex===v).map(n=>esc(n.name));
+function nodeCardHtml(n){ const col=colourOf(n), blk=DATA.N;
+  const chainPos = !n.span ? 'not in a chain' : n.span.start===0&&n.span.end>=blk ? 'the whole model — a chain of one' : n.span.start===0 ? 'first block server' : n.span.end>=blk ? 'last block server' : 'mid-chain';
+  const seamLine = n.seam==='first' ? `<span class="no">receives every routed prompt as raw token IDs</span> — it holds the embedding table, so it must. <span class="claim">F1 · OBSERVED</span>` : n.seam==='hidden' ? `<span class="wa">receives f16 hidden states</span> — a harder inversion target than token IDs, not an impossible one. <span class="claim">F1</span>` : `<i>not serving — nothing routed through it</i>`;
+  const relayNote = n.usingRelay===true&&n.connLabel!=='Relay' ? `<div class="note">says it needs a relay, yet was reached without one: a NATed peer the observer hole-punched — reachable to a DCUtR dialer, not to anyone.</div>` : n.usingRelay===false&&n.connLabel==='Relay' ? `<div class="note">reports <code>using_relay: false</code> but its only published address is a circuit — the self-report is config-time intent and can understate NAT.</div>` : '';
+  const covShare = n.span ? Math.max(0,Math.min(blk,n.span.end))-Math.max(0,n.span.start) : 0;
+  const vpk = n.vpk ? [kv('mode',esc(n.vpk.mode||'?')), kv('capacity',(n.vpk.capacity_gb!=null?n.vpk.capacity_gb+' GB':'?')), kv('tenants',n.vpk.tenant_count??'?'), kv('vpk version',esc(n.vpk.vpk_version||'?')), `<div class="note">a storage host today holds embeddings <b>in the clear</b> at rest — transport-only encryption; PHE is the whitepaper's next phase. <span class="claim">F4 · VERIFIED + REPORTED</span></div>`].join('') : kv('vpk','<i>no storage capability announced</i>');
+  const plat=n.platform, platLine=[plat.os,plat.arch,plat.accel].filter(Boolean).join(' · ');
+  const held = AXES.filter(a=>n.vertex&a.v).map(a=>a.e+' '+a.word).join(' · ') || 'nothing — stratum 0';
+  const partner = (label, v) => kv(label, `V${v} ${bitsHtml(v)} ${namesAt(v).length?'<br>'+namesAt(v).join(', '):'<i>· no peer there</i>'}`);
+  const flips = DATA.latticeEdges.filter(e=>e.a===n||e.b===n).map(e=>{ const o=e.a===n?e.b:e.a; return `${esc(o.name)} <i>(${e.axis.id})</i>`; });
+  const chainMoves = DATA.edges.filter(e=>e.a===n||e.b===n).map(e=>{ const o=e.a===n?e.b:e.a; return `${e.a===n?'→':'←'} ${esc(o.name)} <i>· ${e.move.name} · f ${e.move.f.toFixed(2)}</i>`; });
+  const inWalk = walk.ids.includes(n.id);
+  return `<h2 style="color:${col}">${esc(n.name)}</h2>
+    <div class="badges"><span class="badge fill" style="background:${PAL.state[n.status]}">${n.status}</span><span class="badge" style="color:${PAL.conn[n.connLabel]}">${n.connLabel}</span><span class="badge" style="color:${PAL.tier[n.tier]}">${n.tier} · ${n.attest} attest.</span><span class="badge" style="color:#cfe0ff">V${n.vertex} · stratum ${n.stratum}</span>${n.vpk?`<span class="badge" style="color:${PAL.eve}">VPK Eve</span>`:''}${n.rank?`<span class="badge" style="color:#7fe8d8">#${n.rank} contributor</span>`:''}</div>
+    <div class="cbar" style="margin:0 0 4px"><button data-act="walk" class="${inWalk?'on':''}">${inWalk?'✦ in your walk':'✦ walk it'}</button><button data-act="fly">fly to it</button><button data-act="blocks">light its blocks</button><button data-act="probe">probe reach</button><button data-act="link">copy deep link</button></div>
+    <div id="probeOut" class="note"></div>
+    ${kv('peer id', `<span style="font-size:9px">${esc(n.id)}</span>${cp(n.id)}`)}
+    ${kv('version', esc(n.version||'—')+(n.rawVersion?` <i>(${esc(n.rawVersion)})</i>`:''))}
+    ${kv('announced as', n.rawName?esc(n.rawName):'<i>no public name</i>')}
+    <div class="grp"><div class="sect">serving</div>
+      ${kv('model', n.model?esc(n.model):'<i>no block record</i>')}
+      ${kv('blocks', n.span?`${n.span.start} – ${n.span.end} <i>(${n.blocks} of ${blk} · ${chainPos})</i><div class="bar"><i style="left:${(Math.max(0,n.span.start)/blk*100).toFixed(1)}%;width:${(covShare/blk*100).toFixed(1)}%;background:${col}"></i></div>`:'<i>none announced</i>')}
+      ${kv('throughput', n.throughput?`${n.throughput.toFixed(2)} tok/s`:'<i>0 — none announced</i>')}
+      ${kv('shard', n.status==='Loading'?'<span class="wa">loading</span>':n.status==='Serving'?'<span class="ok">loaded, answering</span>':'<i>not loading</i>')}
+      ${n.dtype||n.quant?kv('dtype',esc([n.dtype,n.quant].filter(Boolean).join(' · '))):''}${n.cache!=null?kv('cache',`${(+n.cache).toLocaleString()} tokens left`):''}
+      ${n.rps.inference!=null||n.rps.forward!=null||n.rps.network!=null?kv('rps',esc(['inference '+n.rps.inference,'forward '+n.rps.forward,'network '+n.rps.network].join(' · '))):''}
+    </div>
+    <div class="grp"><div class="sect">reach</div>
+      ${kv('observer sees', `<b style="color:${PAL.conn[n.connLabel]}">${n.connLabel}</b> <i>· ${n.verdict?'verdict <b>'+esc(n.verdict)+'</b> from the map-server':'derived from the multiaddrs'}</i>`)}
+      ${kv('self-report', n.usingRelay==null?'<i>using_relay absent</i>':`using_relay: <b>${n.usingRelay}</b>`)}${relayNote}
+      ${n.relay?kv('relay',`…${esc(n.relay.slice(-8))} <i>${esc(n.host||'')}</i>`):''}
+      ${kv('where', n.loc.ok?`${esc(n.loc.city)}, ${esc(n.loc.country)}<br><i>${esc(n.loc.isp)} · ${n.loc.lat.toFixed(3)}, ${n.loc.lon.toFixed(3)}</i>`:`<i>${n.loc.city==='Via relay'?'via relay — the relay could not be placed':'geoip could not place it (status '+esc(n.loc.status||'none')+')'}</i>`)}
+      ${kv('addresses', n.addrs.length?n.addrs.map(a=>`<div class="addr">${esc(a)}${cp(a,'⧉')}</div>`).join(''):'<i>none observed — the DHT carries ids, not addresses</i>')}
+      ${kv('kad', yes(n.kad))}${kv('announced', yes(n.announced))}
+    </div>
+    <div class="grp"><div class="sect">on the lattice · a reading</div>
+      ${kv('vertex', `<b>V${n.vertex}</b> · ${b6(n.vertex)} ${bitsHtml(n.vertex)}`)}
+      ${kv('holds', held)}
+      ${kv('stratum', `${n.stratum} of 6 · weight ${W_STRATUM[n.stratum]} · one of ${[1,6,15,20,15,6,1][n.stratum]} states at this depth`)}
+      ${partner('⚔️ neg', LX.neg(n.vertex))}${partner('🧙 bnot', LX.bnot(n.vertex))}${partner('😊 succ', LX.succ(n.vertex))}
+      ${kv('one flip apart', flips.length?flips.join('<br>'):'<i>no peer one flip away</i>')}
+      ${kv('chain moves', chainMoves.length?chainMoves.join('<br>'):'<i>no chain thread</i>')}
+      ${kv('betweenness', n.cb>0?`C_B ${n.cb.toFixed(3)} <i>· paths through it in the chain graph</i>`:'<i>0 — no shortest path crosses it</i>')}
+      <div class="note">the reading is a <span class="claim">THESIS</span>: six rules in the model tab, arguable one by one. The operators and the strata are the model's.</div>
+    </div>
+    <div class="grp"><div class="sect">machine · read from the name</div>${kv('host label',esc(plat.host||'—'))}${kv('platform',platLine?esc(platLine):'<i>nothing the name says</i>')}<div class="note">operators write their own <code>public_name</code>; the CLI appends only the version. A reading of a label, not an announcement.</div></div>
+    <div class="grp"><div class="sect">trust</div>${kv('attestations',`${n.attest} → <b style="color:${PAL.tier[n.tier]}">${n.tier}</b> <i>(v2 design bands: 0 · 1–2 · 3–4 · 5+)</i>`)}<div class="note">chain selection today sorts on a behaviour score and gates on nothing; this tier never touches which peer serves you. <span class="claim">F3 · VERIFIED</span></div></div>
+    <div class="grp"><div class="sect">the seam</div>${kv('prompt exposure', seamLine)}</div>
+    <div class="grp"><div class="sect">storage · vpk</div>${vpk}</div>
+    <div class="grp"><div class="sect">record</div>${kv('seen',`crawl of ${DATA.raw&&DATA.raw.last_updated?esc(String(DATA.raw.last_updated).slice(0,19))+'Z':'?'}`)}${kv('history','<i>not in /api/v1/state — the v2 design (§4.3) wants first/last seen and a sparkline; the contract does not carry them yet</i>')}</div>`; }
+function openCard(n){ const card=$('nodeCard'); $('nodeBody').innerHTML=nodeCardHtml(n); card.classList.add('open');
+  card.querySelectorAll('[data-cp]').forEach(b=>{ b.onclick=()=>navigator.clipboard.writeText(b.dataset.cp).then(()=>{ b.textContent='copied'; setTimeout(()=>b.textContent=b.dataset.cp.length>40?'copy':'⧉',1200); }); });
+  card.querySelector('[data-act=walk]').onclick=()=>{ walkToggle(n.id); openCard(n); };
+  card.querySelector('[data-act=fly]').onclick=()=>flyTo(n.id);
+  card.querySelector('[data-act=blocks]').onclick=()=>{ if(n.span){ state.iso = state.iso&&state.iso.kind==='block' ? null : {kind:'block',key:n.span.start}; applyIso(); } };
+  card.querySelector('[data-act=link]').onclick=e=>{ const u=new URL(location.href); u.searchParams.set('node',n.id); navigator.clipboard.writeText(u.toString()).then(()=>{ e.target.textContent='copied'; }); };
+  card.querySelector('[data-act=probe]').onclick=async e=>{ e.target.disabled=true; const out=$('probeOut'); out.textContent='asking the map-server to dial it…';
+    try{ const r=await fetch('api/v1/is_reachable/'+encodeURIComponent(n.id), {cache:'no-store'}); const j=await r.json(); out.innerHTML='<b>reachability probe</b> · '+esc(JSON.stringify(j)); }catch(err){ out.innerHTML='<span class="no">probe failed</span> · '+esc(err.message); } finally{ e.target.disabled=false; } }; }
+$('nodeCard').querySelector('.nx').onclick=()=>select(null);
+// 🛰️ shows and hides the card; with nothing selected it opens the last-selected or the first serving peer; selecting a peer always shows it
+function paintCardBtn(){ const c=$('nodeCard'); const shown = c.classList.contains('open') && !c.classList.contains('min'); $('zCard').classList.toggle('on', shown); const n=state.selected&&DATA.byId.get(state.selected); $('zCard').title = n ? `${n.name} · V${n.vertex} · ${n.status} — click to ${shown?'hide':'show'} the card` : 'show the node card'; }
+$('zCard').onclick=()=>{ const c=$('nodeCard'); if(!state.selected){ const n=DATA.nodes.find(x=>x.status==='Serving')||DATA.nodes[0]; if(n) select(n.id,false); return; } c.classList.toggle('min'); paintCardBtn(); };
+function select(id, fly){ state.selected=id; const s=id&&objOf(id);
+  if(s){ $('nodeCard').classList.remove('min'); openCard(s.userData.node); OBJ.sel.visible=true; OBJ.sel.position.copy(s.position); OBJ.sel.scale.setScalar(s.userData.base*1.9);
+    for(const m of OBJ.blocks){ const n=s.userData.node; const lit=n.span&&m.userData.block.b>=n.span.start&&m.userData.block.b<n.span.end; m.scale.setScalar(lit?1.7:1); m.material.opacity=lit?1:0.55; }
+    document.querySelectorAll('#covBar .c').forEach(c=>{ const n=s.userData.node; const b=+c.dataset.b; const lit=n.span&&b>=n.span.start&&b<n.span.end; c.classList.toggle('lit',!!lit); c.classList.toggle('dimmed',!lit); });
+    const u=new URL(location.href); u.searchParams.set('node',id); history.replaceState(null,'',u); if(fly) flyTo(id);
+  } else { $('nodeCard').classList.remove('open'); OBJ.sel.visible=false; for(const m of OBJ.blocks){ m.scale.setScalar(1); m.material.opacity=0.9; } document.querySelectorAll('#covBar .c').forEach(c=>c.classList.remove('lit','dimmed')); const u=new URL(location.href); u.searchParams.delete('node'); history.replaceState(null,'',u); }
+  rebuildEdges(); renderTable(); renderDoors(); paintCardBtn(); }
+
+// ===== the walk → the key ==================================================================
+const walk = { ids:[] };
+function walkValue(){ const vs=walk.ids.map(id=>DATA.byId.get(id)).filter(Boolean); const seen=new Map(); let T=1; const moves=[];
+  for(let i=1;i<vs.length;i++){ const m=moveOf(vs[i-1].vertex, vs[i].vertex); const ek=[vs[i-1].vertex,vs[i].vertex].sort((a,b)=>a-b).join('-'); const ne=(seen.get(ek)||0)+1; seen.set(ek,ne); const g=1/Math.sqrt(ne); T+=m.f*g; moves.push({ from:vs[i-1].name, to:vs[i].name, ...m, g, ne }); }
+  return { T, moves, vs }; }
+function walkToggle(id){ const i=walk.ids.indexOf(id); if(i>=0) walk.ids.splice(i,1); else walk.ids.push(id); rebuildWalk(); }
+function rebuildWalkLine(){ if(!OBJ.walk) return; const pts=walk.ids.map(id=>objOf(id)).filter(Boolean).map(s=>s.position.clone()); OBJ.walk.geometry.setFromPoints(pts); }
+function rebuildWalk(){ rebuildWalkLine(); const {T,moves,vs}=walkValue(); let mask=0; for(const v of vs) mask|=v.vertex;
+  $('walkHud').classList.toggle('on', vs.length>0); $('wT').textContent='T(π) '+T.toFixed(2); $('wS').textContent = vs.length ? `${vs.length} peer${vs.length>1?'s':''} walked${moves.length?' · last: '+moves[moves.length-1].name:''} · axes ${b6(mask)}` : 'walk peers into a key';
+  $('keyLine').innerHTML = vs.length ? `<b>${vs.length}</b> walked · T(π) <b>${T.toFixed(2)}</b> · union ${bitsHtml(mask)} ${pc(mask)===6?'· <b>all six held — the apex lights</b>':''}` : 'no peers walked yet — shift+click a star, or ✦ walk it on a card';
+  $('walkList').innerHTML = vs.map((v,i)=>`<div class="frow" data-id="${esc(v.id)}" style="color:${colourOf(v)}"><span class="d"></span><span class="t">${String(i+1).padStart(2,'0')} · ${esc(v.name)}</span><span class="m">V${v.vertex}${i?' · '+moves[i-1].name+' · f '+moves[i-1].f.toFixed(2):''}</span></div>`).join('');
+  $('walkList').querySelectorAll('.frow').forEach(r=>{ r.onclick=()=>select(r.dataset.id,true); });
+  ['wSave','wExport','wSnap'].forEach(id=>{ $(id).disabled = vs.length===0; }); if(state.selected){ const s=objOf(state.selected); if(s) openCard(s.userData.node); } }
+// κ — soulbis rule: canonical JSON (keys sorted, no whitespace), exclude only `kappa`, sha256: prefix (AXIOMS A3)
+function canonicalJSON(v){ if(v===null||typeof v!=='object') return JSON.stringify(v); if(Array.isArray(v)) return '['+v.map(canonicalJSON).join(',')+']'; return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonicalJSON(v[k])).join(',')+'}'; }
+async function sha256hex(s){ const b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+async function kappaLabel(obj){ const c={...obj}; delete c.kappa; return 'sha256:'+await sha256hex(canonicalJSON(c)); }
+let IMPORTED=null;
+async function buildKey(name){ const {T,moves,vs}=walkValue(); let mask=0; for(const v of vs) mask|=v.vertex;
+  const lit=[...new Set(vs.map(v=>v.vertex))].sort((a,b)=>a-b); if(pc(mask)===6 && !lit.includes(63)) lit.push(63);
+  const ids=vs.map(v=>v.id).sort(); const root='sha256:'+await sha256hex(canonicalJSON(ids));
+  const cfg={ name, version:1, palette:{...PALETTE}, lit, packets:{ root, count:vs.length },
+    source:{ kind:'kwaainet-map', chart:'kwaainet constellation', reading:'axis-reading v1 · thesis', crawl:DATA.raw&&DATA.raw.last_updated||null, model:DATA.model?DATA.model.short:null, axisBitmask:mask, T:T.toFixed(2),
+      peers:vs.map(v=>({ id:v.id, name:v.name, vertex:v.vertex })), moves:moves.map(m=>m.name) } };
+  if(OBS.rows.length) cfg.source.observed = OBS.rows.slice(-16).map(r=>[r.at, r.bits]);   // the last rows of the bit recorder ride along, compactly
+  const w=witnessOut(); if(w) cfg.witness=w;
+  if(IMPORTED&&IMPORTED.kappa){ const c={...cfg}; delete c.kappa; if(canonicalJSON(c)!==IMPORTED.canon) cfg.prior=IMPORTED.kappa; }
+  cfg.kappa = await kappaLabel(cfg); return cfg; }
+const keyName = () => ($('findQ').value.trim() && false) || `kwaainet walk · ${new Date().toISOString().slice(0,10)}`;
+$('wExport').onclick=async()=>{ const name=prompt('name this key', keyName()); if(!name) return; const cfg=await buildKey(name);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'})); a.download=name.replace(/[^\w.-]+/g,'-')+'.citykey.json'; a.click(); URL.revokeObjectURL(a.href); };
+$('wClear').onclick=()=>{ walk.ids=[]; rebuildWalk(); };
+// saved constellations — kept locally, relit by peer id
+const CKEY='kwaai-map-constellations'; const loadC=()=>{ try{ return JSON.parse(localStorage.getItem(CKEY))||[]; }catch(e){ return []; } }; const saveC=l=>localStorage.setItem(CKEY,JSON.stringify(l));
+function renderCList(){ const box=$('cList'), list=loadC(); box.innerHTML = list.map((c,i)=>`<div class="crow"><span class="cn">✦ ${esc(c.name)}</span><span class="cm">${c.ids.length} · T ${c.T}</span><span class="cx" title="forget">×</span></div>`).join('') || '<div class="hint" style="margin-top:0">none yet</div>';
+  box.querySelectorAll('.crow').forEach((row,i)=>{ row.querySelector('.cn').onclick=()=>{ walk.ids=list[i].ids.filter(id=>DATA.byId.has(id)); rebuildWalk(); }; row.querySelector('.cx').onclick=()=>{ const l=loadC(); l.splice(i,1); saveC(l); renderCList(); }; }); }
+$('wSave').onclick=()=>{ if(!walk.ids.length) return; const name=prompt('name this constellation', 'constellation '+(loadC().length+1)); if(!name) return; const {T}=walkValue(); const l=loadC(); l.push({ name, at:Date.now(), ids:walk.ids.slice(), T:T.toFixed(2) }); saveC(l); renderCList(); };
+renderCList();
+// import — JSON, or a PNG carrying a tEXt `cityKey` chunk (AXIOMS A7; the same reader as /lattice)
+const b2s = u => { let s=''; for(let i=0;i<u.length;i++) s+=String.fromCharCode(u[i]); return s; };
+function pngExtractKey(buf){ const u=new Uint8Array(buf); if(u.length<20||u[0]!==0x89||u[1]!==0x50||u[2]!==0x4e||u[3]!==0x47) return null; let p=8;
+  while(p+12<=u.length){ const len=((u[p]<<24)|(u[p+1]<<16)|(u[p+2]<<8)|u[p+3])>>>0; const type=String.fromCharCode(u[p+4],u[p+5],u[p+6],u[p+7]);
+    if(type==='tEXt'){ const data=u.subarray(p+8,p+8+len), z=data.indexOf(0); if(z>0&&b2s(data.subarray(0,z))==='cityKey'){ try{ const bin=atob(b2s(data.subarray(z+1))), bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return JSON.parse(new TextDecoder().decode(bytes)); }catch(e){ return null; } } }
+    if(type==='IEND') break; p+=12+len; } return null; }
+async function importKey(cfg){ if(!cfg||typeof cfg!=='object') throw new Error('not a key');
+  const k = typeof cfg.kappa==='string' ? await kappaLabel(cfg) : null; const verified = k && k===cfg.kappa;
+  const c={...cfg}; delete c.kappa; delete c.prior; IMPORTED={ kappa:cfg.kappa||null, canon:canonicalJSON(c), name:cfg.name };
+  // the key's palette and geometry are the KEY LAYER's, not the globe's
+  KEYPAL={...CANON}; if(cfg.palette&&typeof cfg.palette==='object'){ for(const key of ['cool','warm','sword','mage']) if(/^#[0-9a-f]{6}$/i.test(cfg.palette[key]||'')) KEYPAL[key]=cfg.palette[key]; }
+  KEYGEO={ eps:0.35, m:5, n:6, core:0.60, smRatio:1.0 }; if(cfg.geometry&&typeof cfg.geometry==='object'){ for(const k of ['eps','m','n','core','smRatio']) if(Number.isFinite(+cfg.geometry[k])) KEYGEO[k]=+cfg.geometry[k]; }
+  const lit = new Set(Array.isArray(cfg.lit)?cfg.lit.filter(x=>Number.isInteger(x)&&x>=0&&x<64):[]); KEYLIT=lit;
+  const peers = cfg.source&&Array.isArray(cfg.source.peers) ? cfg.source.peers.map(p=>p&&p.id).filter(id=>DATA.byId.has(id)) : [];
+  if(peers.length){ walk.ids=peers; rebuildWalk(); }
+  state.key=true; $('tKey').classList.add('on'); buildKeyLayer(); state.iso=null; document.querySelector('#colourBy [data-c=model]').click(); applyIso(); renderMyNode(); rebuildAll();   // the scene reads in the key's palette by stratum
+  const standing = DATA.nodes.filter(n=>lit.has(n.vertex)).length;
+  const missing = cfg.source&&Array.isArray(cfg.source.peers) ? cfg.source.peers.length-peers.length : 0;
+  $('kImported').innerHTML = `imported <b>${esc(cfg.name||'unnamed key')}</b> · ${cfg.kappa ? (verified?'<span style="color:#9ff0d4">κ verified</span>':'<span style="color:#ff9d9d">κ mismatch — content differs from its label</span>') : 'no κ'} · ${lit.size} lit vert${lit.size===1?'ex':'ices'} · <b>${standing}</b> peer${standing===1?'':'s'} standing on them${peers.length?` · ${peers.length} walked peer${peers.length===1?'':'s'} relit`:''}${missing?` · ${missing} not on this crawl`:''}${cfg.prior?' · carries a prior':''}`; }
+$('kClear').onclick=()=>{ IMPORTED=null; KEYLIT=new Set(); KEYPAL={...CANON}; state.key=false; $('tKey').classList.remove('on'); keyGroup.visible=false; $('kImported').innerHTML=''; document.querySelector('#colourBy [data-c=state]').click(); renderMyNode(); rebuildAll(); };
+async function importFile(file){ try{ const buf=await file.arrayBuffer(); const cfg=pngExtractKey(buf)||JSON.parse(new TextDecoder().decode(buf)); await importKey(cfg); showTab('key'); }catch(e){ $('kImported').innerHTML='<span style="color:#ff9d9d">could not read that as a key</span> · '+esc(e.message); showTab('key'); } }
+$('wImport').addEventListener('change', e=>{ const f=e.target.files[0]; if(f) importFile(f); e.target.value=''; });
+{ const dz=$('kdrop'); dz.ondragover=e=>{ e.preventDefault(); dz.classList.add('over'); }; dz.ondragleave=()=>dz.classList.remove('over'); dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove('over'); const f=e.dataTransfer.files[0]; if(f) importFile(f); };
+  addEventListener('dragover', e=>{ if(e.target===canvas) e.preventDefault(); }); addEventListener('drop', e=>{ if(e.target!==canvas) return; e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) importFile(f); }); }
+// keepsake — the view as a PNG with the key inside (tEXt `cityKey`, base64, CRC-32 valid — AXIOMS A7)
+const CRC_T=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c; } return t; })();
+const crc32 = buf => { let c=0xFFFFFFFF; for(let i=0;i<buf.length;i++) c=CRC_T[(c^buf[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; };
+function cityKeyPNG(dataURL, cfg){ const bin=atob(dataURL.split(',')[1]); const png=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) png[i]=bin.charCodeAt(i);
+  const json=new TextEncoder().encode(JSON.stringify(cfg)); let b64=''; for(let i=0;i<json.length;i++) b64+=String.fromCharCode(json[i]); b64=btoa(b64);
+  const kw=new TextEncoder().encode('cityKey'), txt=new TextEncoder().encode(b64); const data=new Uint8Array(kw.length+1+txt.length); data.set(kw,0); data.set(txt,kw.length+1);
+  const chunk=new Uint8Array(12+data.length), dv=new DataView(chunk.buffer); dv.setUint32(0,data.length); chunk.set([116,69,88,116],4); chunk.set(data,8); dv.setUint32(8+data.length, crc32(chunk.slice(4,8+data.length)));
+  const cut=33; const out=new Uint8Array(png.length+chunk.length); out.set(png.slice(0,cut),0); out.set(chunk,cut); out.set(png.slice(cut),cut+chunk.length); return new Blob([out],{type:'image/png'}); }
+async function keepsake(){ renderer.render(scene,camera); const url=canvas.toDataURL('image/png'); const name = walk.ids.length ? (prompt('name the key this keepsake carries', keyName())||keyName()) : null;
+  const a=document.createElement('a'); if(name){ const cfg=await buildKey(name); a.href=URL.createObjectURL(cityKeyPNG(url,cfg)); a.download=name.replace(/[^\w.-]+/g,'-')+'.png'; } else { a.href=url; a.download=`kwaainet-constellation-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`; } a.click(); if(name) URL.revokeObjectURL(a.href); }
+$('wSnap').onclick=keepsake; $('snapBtn').onclick=keepsake;
+
+// ===== the observer — a light circuit over your walk (or the serving chain); each visit is counted into a witness =====
+// The same shape as /lattice's witness (`spent`: vertex → visits): presence recorded as a count, not claimed as a proof.
+const WIT = { spent:{}, passes:0, at:null };
+const runner = { on:false, dist:0, lastSeg:-1, flares:[], spr:null, speed:0.9, dir:1, route:'auto' };
+runner.spr = new THREE.Sprite(spriteMat(GLOW,'#ffd27a',0.9)); runner.spr.scale.setScalar(0.16); runner.spr.visible=false; world.add(runner.spr);
+function circuitNodes(){ const r=runner.route; const chain=()=>DATA.nodes.filter(n=>n.status==='Serving'&&n.span).sort((a,b)=>a.span.start-b.span.start);
+  if(r==='chain') return chain(); if(r==='ring') return DATA.nodes.slice().sort((a,b)=>a.vertex-b.vertex||a.name.localeCompare(b.name));
+  if(r==='stratum') return DATA.nodes.slice().sort((a,b)=>a.stratum-b.stratum||a.vertex-b.vertex||a.name.localeCompare(b.name));
+  return walk.ids.length>=2 ? walk.ids.map(id=>DATA.byId.get(id)).filter(Boolean) : chain(); }
+const runCard=$('runCard'); let runCardTimer=null;
+function runCardShow(n){ runCard.innerHTML=`<b>${esc(n.name)}</b><br><span class="m">V${n.vertex} · ${b6(n.vertex)} · stratum ${n.stratum} · ${n.status}${n.span?' · blocks '+n.span.start+'–'+n.span.end:''}</span>`; runCard.classList.remove('show'); void runCard.offsetWidth; runCard.classList.add('show'); clearTimeout(runCardTimer); runCardTimer=setTimeout(()=>runCard.classList.remove('show'),2400); }
+function visitNode(n){ const s=objOf(n.id); if(s) runner.flares.push({ s, life:1 }); WIT.spent[n.vertex]=(WIT.spent[n.vertex]||0)+1; WIT.at=new Date().toISOString(); runCardShow(n); renderWitness(); }
+function circuitGeometry(){ const ns=circuitNodes(); const pts=ns.map(n=>objOf(n.id)).filter(Boolean).map(s=>s.position); if(pts.length<2) return null; pts.push(pts[0]);
+  const segs=[]; let total=0; for(let i=0;i<pts.length-1;i++){ const L=pts[i].distanceTo(pts[i+1]); segs.push(L); total+=L; } return total>0 ? { ns, pts, segs, total } : null; }
+function runnerTick(dt){ for(const f of runner.flares){ f.life-=dt*1.1; f.s.scale.setScalar(f.s.userData.base*(1+2.2*Math.max(f.life,0))); } runner.flares=runner.flares.filter(f=>f.life>0);
+  const g=circuitGeometry(); if(!runner.on||!g){ runner.spr.visible=false; return; } runner.spr.visible=true; const { ns, pts, segs, total }=g;
+  const prev=runner.dist; runner.dist=((runner.dist+dt*runner.speed*runner.dir)%total+total)%total; if(Math.abs(runner.dist-prev)>total/2) WIT.passes++;
+  let d=runner.dist, i=0; while(i<segs.length-1&&d>segs[i]){ d-=segs[i]; i++; } runner.spr.position.lerpVectors(pts[i],pts[i+1], segs[i]?Math.min(d/segs[i],1):0);
+  if(i!==runner.lastSeg){ runner.lastSeg=i; visitNode(ns[(runner.dir>0?i:(i+1)%ns.length)]); } }
+function stepOnce(){ const g=circuitGeometry(); if(!g) return; const { ns, segs }=g; let d=runner.dist, i=0; while(i<segs.length-1&&d>segs[i]){ d-=segs[i]; i++; }
+  const j=((i+runner.dir)%segs.length+segs.length)%segs.length; let start=0; for(let k=0;k<j;k++) start+=segs[k]; runner.dist=start+0.0001; runner.lastSeg=j; runner.spr.visible=true; runner.spr.position.copy(g.pts[j]); visitNode(ns[j]); }
+function witnessOut(){ const tot=Object.values(WIT.spent).reduce((a,b)=>a+b,0); if(!tot) return null; return { spent:{...WIT.spent}, complete:false, at:WIT.at, passes:WIT.passes }; }
+function setRunning(on){ runner.on=on; if(on){ runner.lastSeg=-1; } runner.spr.visible=on; for(const id of ['wRun','obRun']){ const b=$(id); b.classList.toggle('on',on); b.textContent = on ? (id==='wRun'?'■ observing':'■ stop') : (id==='wRun'?'▶ observe':'▶ run'); } if(!on) runCard.classList.remove('show'); renderWitness(); }
+function renderWitness(){ const v=Object.keys(WIT.spent).length, tot=Object.values(WIT.spent).reduce((a,b)=>a+b,0);
+  $('witLine').innerHTML = tot ? `witness · <b>${tot}</b> visits over <b>${v}</b> vert${v===1?'ex':'ices'} · <b>${WIT.passes}</b> full pass${WIT.passes===1?'':'es'} · <b>${OBS.rows.length}</b> observation${OBS.rows.length===1?'':'s'} recorded` : 'no witness yet — ▶ observe runs a light around your walk (or the serving chain) and counts each visit; ● rec on the coverage bar records each crawl';
+  const ns=circuitNodes(); const routeName={ auto: walk.ids.length>=2?'your walk':'the serving chain', chain:'the serving chain', ring:'all peers in succ order', stratum:'all peers by stratum' }[runner.route];
+  $('obLine').innerHTML = `${runner.on?'<b>running</b>':'still'} · ${routeName} · <b>${ns.length}</b> peer${ns.length===1?'':'s'} on the route · ${runner.dir>0?'clockwise':'anticlockwise'} · <b>${WIT.passes}</b> pass${WIT.passes===1?'':'es'}`;
+  const rows=Object.entries(WIT.spent).map(([v,c])=>[+v,c]).sort((a,b)=>b[1]-a[1]);
+  $('obSpent').innerHTML = rows.length ? rows.map(([v,c])=>`<div class="frow" style="color:#ffd27a"><span class="d"></span><span class="t">V${v} · ${b6(v)} · stratum ${pc(v)}</span><span class="m">${c} visit${c===1?'':'s'} · ${namesAt(v).slice(0,3).join(', ')}${namesAt(v).length>3?' …':''}</span></div>`).join('') : 'no visits yet';
+  $('obRows').innerHTML = OBS.rows.length ? OBS.rows.slice(-6).reverse().map(r=>`${esc(String(r.at).slice(11,19))}Z · ${r.bits.split('1').length-1}/${r.bits.length} covered · ${r.serving} serving · ${r.peers} peers`).join('<br>') + (OBS.rows.length>6?`<br><i>… ${OBS.rows.length} rows kept locally</i>`:'') : 'nothing recorded yet — turn ● rec on and each new crawl writes a row'; }
+$('wRun').onclick=()=>setRunning(!runner.on); $('obRun').onclick=()=>setRunning(!runner.on);
+$('obStep').onclick=()=>{ if(runner.on) setRunning(false); stepOnce(); };
+$('obDir').onclick=()=>{ runner.dir=-runner.dir; runner.lastSeg=-1; renderWitness(); };
+$('obSpeed').addEventListener('input', ()=>{ runner.speed=+$('obSpeed').value; $('obSpeedV').textContent=runner.speed.toFixed(2); });
+document.querySelectorAll('#obRoute button').forEach(b=>{ b.onclick=()=>{ runner.route=b.dataset.r; runner.dist=0; runner.lastSeg=-1; document.querySelectorAll('#obRoute button').forEach(x=>x.classList.toggle('on',x===b)); renderWitness(); }; });
+$('obReset').onclick=()=>{ WIT.spent={}; WIT.passes=0; WIT.at=null; renderWitness(); };
+
+// ===== the coverage recorder — one row of bits per crawl: the bit circuit that records your observation of the network =====
+const OBS = { on:false, rows:[] }; const OKEY='kwaai-map-observations';
+try{ OBS.rows=JSON.parse(localStorage.getItem(OKEY))||[]; }catch(e){}
+function recordObservation(){ if(!OBS.on||!DATA.raw) return; const bits=DATA.blocks.map(b=>b.serving.length?'1':'0').join(''); const at=DATA.raw.last_updated||new Date().toISOString();
+  if(OBS.rows.length && OBS.rows[OBS.rows.length-1].at===at) return;   // one crawl is one observation, however often the page reads it
+  OBS.rows.push({ at, bits, serving:DATA.nodes.filter(n=>n.status==='Serving').length, peers:DATA.nodes.length }); if(OBS.rows.length>512) OBS.rows.splice(0, OBS.rows.length-512);
+  try{ localStorage.setItem(OKEY, JSON.stringify(OBS.rows)); }catch(e){} renderRecorder(); renderWitness(); }
+function renderRecorder(){ const cv=$('covRec'); const rows=OBS.rows.slice(-48); $('recN').textContent=`${OBS.rows.length} observation${OBS.rows.length===1?'':'s'}`; if(!rows.length){ cv.style.height='0'; return; }
+  const W=cv.clientWidth||600, H=Math.min(96, Math.max(8, rows.length*4)); cv.width=W*devicePixelRatio; cv.height=H*devicePixelRatio; cv.style.height=H+'px'; const ctx=cv.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio); ctx.clearRect(0,0,W,H);
+  const N=DATA.N||32, cw=W/N, rh=H/rows.length; rows.forEach((r,ri)=>{ for(let b=0;b<N;b++){ ctx.fillStyle = r.bits[b]==='1' ? 'rgba(16,185,129,0.75)' : 'rgba(239,68,68,0.55)'; ctx.fillRect(b*cw+0.5, ri*rh, cw-1, Math.max(1,rh-0.5)); } }); }
+function setRec(on){ OBS.on=on; for(const id of ['recBtn','obRec']){ const b=$(id); b.classList.toggle('on',on); b.textContent=on?'● recording':'● rec'; } if(on) recordObservation(); renderWitness(); renderCoverage(); }
+$('recBtn').onclick=()=>setRec(!OBS.on); $('obRec').onclick=()=>setRec(!OBS.on);
+$('obExport').onclick=()=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({ kind:'kwaainet-observations', exported:new Date().toISOString(), model:DATA.model?DATA.model.short:null, blocks:DATA.N, rows:OBS.rows },null,2)],{type:'application/json'})); a.download=`kwaainet-observations-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href); };
+$('obClear').onclick=()=>{ OBS.rows=[]; try{ localStorage.removeItem(OKEY); }catch(e){} renderRecorder(); renderWitness(); };
+
+// ===== the boundary key — the whole network assigned to the star; the same crawl reads the same root anywhere =====
+async function buildBoundaryKey(name){ const occ={}; for(const n of DATA.nodes) occ[n.vertex]=(occ[n.vertex]||0)+1;
+  const edges=[]; const add=(a,b,kind)=>edges.push([Math.min(a.vertex,b.vertex),Math.max(a.vertex,b.vertex),kind]);
+  for(const {a,b} of DATA.edges) add(a,b,'chain'); for(const {a,b} of DATA.latticeEdges) add(a,b,'flip');
+  edges.sort((p,q)=>p[0]-q[0]||p[1]-q[1]||p[2].localeCompare(q[2]));
+  const boundary={ vertices:occ, edges };   // no seating, no palette, no names: the boundary encodes the bulk (holographic bound, C9)
+  const root='sha256:'+await sha256hex(canonicalJSON(boundary));
+  const lit=Object.keys(occ).map(Number).sort((a,b)=>a-b); let mask=0; for(const v of lit) mask|=v; if(pc(mask)===6&&!lit.includes(63)) lit.push(63);
+  const highlighted=[...new Set([...walk.ids, state.selected].filter(Boolean))]; const me=myNode();
+  const cfg={ name, version:1, palette:{...PALETTE}, lit, packets:{ root, count:edges.length },
+    source:{ kind:'kwaainet-boundary', chart:'kwaainet constellation', reading:'axis-reading v1 · thesis', crawl:DATA.raw&&DATA.raw.last_updated||null, model:DATA.model?DATA.model.short:null, axisBitmask:mask,
+      peers:DATA.nodes.map(n=>({ id:n.id, name:n.name, vertex:n.vertex })), boundary, highlighted, self: me?{ id:me.id, name:me.name, vertex:me.vertex }:null, strata:DATA.strata, networkTerm:netTerm().toFixed(3) } };
+  const w=witnessOut(); if(w) cfg.witness=w; cfg.kappa=await kappaLabel(cfg); return cfg; }
+$('wBoundary').onclick=async()=>{ const name=prompt('name this star key', `kwaainet · ${DATA.raw&&DATA.raw.last_updated?String(DATA.raw.last_updated).slice(0,16)+'Z':'now'}`); if(!name) return; const cfg=await buildBoundaryKey(name);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'})); a.download=name.replace(/[^\w.-]+/g,'-')+'.citykey.json'; a.click(); URL.revokeObjectURL(a.href); };
+// my node — by public name or peer id; kept locally; ringed sword-red on the chart and named as `self` in the boundary key
+const MKEY='kwaai-map-my-node'; try{ $('myNode').value=localStorage.getItem(MKEY)||''; }catch(e){}
+function myNode(){ const q=$('myNode').value.trim().toLowerCase(); if(!q) return null; return DATA.nodes.find(n=>n.id.toLowerCase()===q||n.name.toLowerCase()===q||n.rawName.toLowerCase()===q) || DATA.nodes.find(n=>n.name.toLowerCase().includes(q)) || null; }
+function renderMyNode(){ const me=myNode(); $('myNodeV').innerHTML = me ? `<span class="ok">found · V${me.vertex} · ${me.status}</span>` : ($('myNode').value.trim() ? '<span class="wa">not on this crawl</span>' : '—');
+  for(const s of OBJ.nodes){ const n=s.userData.node; const r=s.userData.ring;
+    if(me&&n===me){ r.visible=true; r.material.color.set(PALETTE.sword); } else if(state.key&&KEYLIT.has(n.vertex)){ r.visible=true; r.material.color.set(KEYPAL.sword); } else { r.visible=!!n.vpk; r.material.color.set(PAL.eve); } } }
+$('myNode').addEventListener('input', ()=>{ try{ localStorage.setItem(MKEY, $('myNode').value.trim()); }catch(e){} renderMyNode(); });
+
+// ===== palette wells — the carrier palette, applied to the globe, kept, carried in the key =====
+function savePalette(){ try{ localStorage.setItem(PALKEY, JSON.stringify(PALETTE)); }catch(e){} }
+function applyPalette(){ sphere.material.color.set(PALETTE.cool); land.material.color.set(PALETTE.warm); grat.material.color.set(PALETTE.warm);
+  if(OBJ.sel) OBJ.sel.material.color.set(PALETTE.sword); if(OBJ.walk) OBJ.walk.material.color.set(PALETTE.sword); if(OBJ.edgesV){ OBJ.edgesV.material.color.set(PALETTE.mage); OBJ.edgesDim.material.color.set(PALETTE.mage); } if(OBJ.lattice) OBJ.lattice.material.color.set(PALETTE.warm);
+  for(const s of OBJ.nodes){ const old=s.userData.label; const lab=labelSprite(s.userData.node.name, PALETTE.warm); lab.position.copy(old.position); lab.visible=old.visible; labelGroup.remove(old); old.material.map.dispose(); old.material.dispose(); labelGroup.add(lab); s.userData.label=lab; }
+  document.documentElement.style.setProperty('--sword', PALETTE.sword); document.documentElement.style.setProperty('--mage', PALETTE.mage);
+  document.querySelectorAll('#pal input').forEach(i=>{ i.value=PALETTE[i.dataset.k]; }); applyColours(); }
+{ const box=$('pal'); for(const k of ['cool','warm','sword','mage']){ const lab=document.createElement('label'); const inp=document.createElement('input'); inp.type='color'; inp.value=PALETTE[k]; inp.dataset.k=k; inp.title=k;
+    inp.oninput=()=>{ PALETTE[k]=inp.value; savePalette(); applyPalette(); }; lab.appendChild(inp); lab.appendChild(document.createTextNode(k)); box.appendChild(lab); }
+  $('palReset').onclick=()=>{ PALETTE={...CANON}; savePalette(); applyPalette(); }; }
+
+// ===== camera =====================================================================================
+let flight=null;
+function flyTo(id){ const s=objOf(id); if(!s) return; const wp=s.getWorldPosition(new THREE.Vector3()); let cam,tgt;
+  if(state.fold<0.5){ const dist=Math.max(3.4, camera.position.length()*0.85); cam=wp.clone().normalize().multiplyScalar(dist); tgt=new THREE.Vector3(0,0,0); } else { tgt=wp.clone(); cam=wp.clone().add(new THREE.Vector3(0,0,3.0)); }
+  flight={ c0:camera.position.clone(), c1:cam, t0:controls.target.clone(), t1:tgt, at:0 }; interacted=true; }
+// the flat seatings sit a little left of centre so an open side panel (on the left) does not cover them
+function flyView(which){ const cam = which==='chain' ? new THREE.Vector3(-0.55,0.15,5.8) : which==='star' ? new THREE.Vector3(-0.4,1.4,5.6) : new THREE.Vector3(0,1.3,5.4);
+  const tgt = which==='chain' ? new THREE.Vector3(-0.55,0.15,0) : which==='star' ? new THREE.Vector3(-0.4,0,0) : new THREE.Vector3(0,0,0);
+  flight={ c0:camera.position.clone(), c1:cam, t0:controls.target.clone(), t1:tgt, at:0 }; }
+function flightTick(dt){ if(!flight) return; flight.at=Math.min(1,flight.at+dt/0.8); const k=ease(flight.at); camera.position.lerpVectors(flight.c0,flight.c1,k); controls.target.lerpVectors(flight.t0,flight.t1,k); if(flight.at>=1) flight=null; }
+
+// ===== pointer ====================================================================================
+const ray=new THREE.Raycaster(); const ptr=new THREE.Vector2(); const tip=$('tip'); let hovered=null, interacted=false, ptrOnCanvas=false, downAt=null;
+addEventListener('pointermove', e=>{ ptr.x=(e.clientX/innerWidth)*2-1; ptr.y=-(e.clientY/innerHeight)*2+1; ptrOnCanvas=e.target===canvas; if(ptrOnCanvas){ tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY+10)+'px'; } });
+canvas.addEventListener('pointerdown', e=>{ interacted=true; downAt=[e.clientX,e.clientY]; });
+canvas.addEventListener('click', e=>{ if(downAt && Math.hypot(e.clientX-downAt[0], e.clientY-downAt[1])>6) return; ptr.x=(e.clientX/innerWidth)*2-1; ptr.y=-(e.clientY/innerHeight)*2+1; pick();
+  if(!hovered){ if(state.selected) select(null); return; } const d=hovered.userData;
+  if(d.kind==='node'){ if(e.shiftKey){ walkToggle(d.node.id); return; } select(d.node.id,false); } else if(d.kind==='block') setIso('block',d.block.b); else if(d.kind==='boot') setIso('conn','Relay');
+  else if(d.kind==='vertex'){ const x=d.x; if(state.iso&&state.iso.kind==='lit'&&state.iso.key.size===1&&state.iso.key.has(x)){ state.iso=null; } else state.iso={ kind:'lit', key:new Set([x]) }; applyIso(); } });
+function pick(){ if(!ptrOnCanvas||!OBJ.nodes.length){ if(hovered){ hovered=null; tip.style.display='none'; canvas.style.cursor='grab'; } return; }
+  ray.setFromCamera(ptr,camera); const cands=[...OBJ.nodes.filter(s=>s.material.opacity>0.3), ...(state.blocks?OBJ.blocks:[]), ...OBJ.boots, ...(fStar()>0.5?STAR.gems:[])]; const hit=ray.intersectObjects(cands,false)[0]; const obj=hit?hit.object:null;
+  if(obj!==hovered){ hovered=obj; if(obj){ const d=obj.userData;
+      if(d.kind==='vertex'){ const x=d.x; const here=namesAt(x); tip.innerHTML=`<b>V${x}</b> <span class="m">${b6(x)} · stratum ${pc(x)} · ${AXES.filter(a=>x&a.v).map(a=>a.e).join('')||'∅'}</span><br><span class="m">${here.length?here.join(', '):'no peer here'} · ⚔️ V${LX.neg(x)} · 🧙 V${LX.bnot(x)} · 😊 V${LX.succ(x)}</span>`; }
+      if(d.kind==='node'){ const n=d.node; tip.innerHTML=`<b>${esc(n.name)}</b> <span class="m">${esc(n.version)}</span><br><span class="m" style="color:${PAL.state[n.status]}">${n.status}</span> <span class="m">· ${n.connLabel} · ${esc(n.place)}</span><br><span class="m">${n.span?`blocks ${n.span.start}–${n.span.end} (${n.blocks})`:'no block range'} · ${n.throughput?n.throughput.toFixed(1)+' tok/s':'no throughput'} · V${n.vertex} s${n.stratum}${n.vpk?' · VPK Eve':''}</span>`
+        + (state.colour==='seam'?`<br><span class="m" style="color:${colourOf(n)}">${n.seam==='first'?'sees the raw prompt':n.seam==='hidden'?'sees hidden states':'not in the chain'}</span>`:'') + (walk.ids.includes(n.id)?'<br><span class="m" style="color:'+PALETTE.sword+'">✦ in your walk</span>':''); }
+      else if(d.kind==='block'){ const b=d.block; tip.innerHTML=`<b>block ${b.b}</b><br><span class="m">${b.serving.length} serving · ${b.loading.length} loading${b.serving.length?'<br>'+b.serving.map(n=>esc(n.name)).join(', '):''}</span>`; }
+      else if(d.kind==='boot'){ const b=d.boot; tip.innerHTML=`<b>bootstrap · relay</b><br><span class="m">${esc(b.host||'')} · …${esc(b.id.slice(-6))}<br>${b.ok?esc(b.isp||''):'unplaced'} · ${b.behind.length} peer${b.behind.length===1?'':'s'} relayed through it</span>`; }
+      tip.style.display='block'; canvas.style.cursor='pointer'; } else { tip.style.display='none'; canvas.style.cursor='grab'; } } }
+
+// ===== controls ===================================================================================
+const foldEl=$('fold'); let lastFoldSide=0;
+function setFold(v){ state.fold=v; foldEl.value=v; const f=v; $('foldV').textContent = f<0.05?'globe':Math.abs(f-1)<0.05?'chain':f>1.95?'star':f<1?'globe → chain '+(f*100|0)+'%':'chain → star '+((f-1)*100|0)+'%';
+  const side = f<0.5?0:f<1.5?1:2; if(side!==lastFoldSide){ lastFoldSide=side; flyView(['globe','chain','star'][side]); } document.querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on', +b.dataset.f===side && Math.abs(f-side)<0.05)); rebuildAll(); }
+foldEl.addEventListener('input', ()=>setFold(Number(foldEl.value)));
+document.querySelectorAll('[data-f]').forEach(b=>{ b.onclick=()=>{ const from=state.fold, to=+b.dataset.f, t0=performance.now(); const step=now=>{ const k=Math.min(1,(now-t0)/900); setFold(from+(to-from)*ease(k)); if(k<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }; });
+document.querySelectorAll('#colourBy button').forEach(b=>{ b.onclick=()=>{ state.colour=b.dataset.c; document.querySelectorAll('#colourBy button').forEach(x=>x.classList.toggle('on',x===b)); applyColours(); renderTable(); renderFind(); renderAbout(); rebuildWalk(); }; });
+const togs={ tLand:['land',()=>{ land.visible=state.land; }], tGrid:['grid',()=>{ grat.visible=state.grid; chainGrid.visible=state.grid; }], tBlocks:['blocks',()=>{ blockGroup.visible=state.blocks; }], tChain:['chain',()=>{ edgeGroup.visible=state.chain; }],
+  tRelays:['relays',()=>{ relayGroup.visible=state.relays; }], tLattice:['lattice',()=>{ latticeGroup.visible=state.lattice; }], tKey:['key',()=>{ if(state.key&&!KEY.built) buildKeyLayer(); renderMyNode(); rebuildAll(); }], tLabels:['labels',()=>{ applyIso(); }], tDrift:['drift',()=>{}],
+  tGlow:['glow',()=>{ const m=state.glow?THREE.AdditiveBlending:THREE.NormalBlending; for(const s of OBJ.nodes){ s.material.blending=m; s.material.needsUpdate=true; } }] };
+for(const [id,[key,fn]] of Object.entries(togs)){ $(id).classList.toggle('on',state[key]); $(id).onclick=e=>{ state[key]=!state[key]; e.target.classList.toggle('on',state[key]); fn(); }; }
+$('seamOn').onclick=()=>{ document.querySelector('#colourBy [data-c=seam]').click(); };
+$('seamFirst').onclick=()=>{ document.querySelector('#colourBy [data-c=seam]').click(); setIso('seam','first'); };
+$('refreshNow').onclick=()=>load(false); $('autoRef').onclick=e=>{ state.auto=!state.auto; e.target.classList.toggle('on',state.auto); };
+$('focusBtn').onclick=()=>document.body.classList.toggle('zen');
+$('layoutReset').onclick=()=>{ for(const k of ['kwaai-map-tab','kwaai-map-cov-min','kwaai-map-palette','kwaai-map-palette-v2','kwaai-map-my-node']){ try{ localStorage.removeItem(k); }catch(e){} } location.href=location.pathname; };
+
+// ===== the side: one panel, named tabs ===============================================================
+const TABS=[ {id:'legend',g:'🧭',w:'legend',t:'legend · what the colours say'}, {id:'view',g:'🎛',w:'view',t:'view · fold, colour, layers, palette'}, {id:'find',g:'🔎',w:'find',t:'find a node'}, {id:'peers',g:'📋',w:'peers',t:'every peer'},
+  {id:'seam',g:'🧬',w:'seam',t:'the seam · vpk lens'}, {id:'key',g:'🗝',w:'key',t:'your key · walk peers into a City Key'}, {id:'observe',g:'◉',w:'observe',t:'observe · the light, the witness, the recorder'},
+  {id:'model',g:'⬡',w:'model',t:'the lattice reading · privacy is value'}, {id:'doors',g:'🚪',w:'doors',t:'doors · source, your node, the star side'} ];
+const tabsEl=$('tabs'), sideEl=$('side'), sideBody=$('sideBody'); const TKEY='kwaai-map-tab'; let activeTab=null;
+for(const t of TABS){ const node=$(t.id); const sec=document.createElement('section'); sec.dataset.tab=t.id; sec.appendChild(node); sideBody.appendChild(sec);
+  const b=document.createElement('button'); b.dataset.tab=t.id; b.innerHTML=`<span class="g">${t.g}</span><span class="w">${t.w}</span>`; b.title=t.t; b.onclick=()=>showTab(activeTab===t.id?null:t.id); tabsEl.appendChild(b); }
+{ const a=document.createElement('a'); a.href='guide.html'; a.innerHTML='<span class="g">📖</span><span class="w">guide</span>'; a.title='how to read this map'; tabsEl.appendChild(a); }
+function showTab(id){ activeTab=id; for(const sec of sideBody.children) sec.classList.toggle('on', sec.dataset.tab===id); for(const b of tabsEl.querySelectorAll('button')) b.classList.toggle('on', b.dataset.tab===id);
+  sideEl.classList.toggle('closed', !id); const t=TABS.find(x=>x.id===id); $('sideTitle').textContent=t?t.t:''; try{ localStorage.setItem(TKEY, id||''); }catch(e){} if(id==='find') setTimeout(()=>$('findQ').focus(),50); }
+$('sideX').onclick=()=>showTab(null);
+const typing = e => { const el=e.target; return !!el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'||el.isContentEditable); };
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(typing(e)){ e.target.blur(); return; } if(document.body.classList.contains('zen')){ document.body.classList.remove('zen'); return; } if(state.selected){ select(null); return; } if(state.iso){ state.iso=null; applyIso(); return; } showTab(null); }
+  if(e.key==='/'&&!typing(e)){ e.preventDefault(); showTab('find'); } });
+(()=>{ let last=null; try{ last=localStorage.getItem(TKEY); }catch(e){} const known=TABS.some(t=>t.id===last);   // a tab id remembered from an earlier version is not trusted
+  showTab(last===null ? 'legend' : last==='' ? null : known ? last : 'legend'); })();
+
+// ===== load =========================================================================================
+let loading=false;
+async function load(first){ if(loading) return; loading=true; const prevSel=state.selected; let raw=null, source='—';
+  const SRC=new URLSearchParams(location.search).get('src');
+  try{ const r=await fetch(SRC||'api/v1/state',{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); raw=await r.json(); source = SRC ? 'file · '+SRC : (r.headers.get('x-map-source')||'live'); }
+  catch(e){ try{ raw=await (await fetch('data/state.json',{cache:'no-store'})).json(); source='baked'; }catch(e2){ $('status').innerHTML='<span class="src baked">no state reachable — neither the seam nor the bake</span>'; loading=false; return; } }
+  state.source=source; ingest(raw); layout(); applyPalette(); renderStatus(); renderLegend(); renderTable(); renderFind(); renderAbout(); rebuildWalk(); renderMyNode(); recordObservation(); renderRecorder(); renderWitness();
+  if(first){ const want=new URLSearchParams(location.search).get('node'); if(want&&DATA.byId.has(want)) setTimeout(()=>select(want,true),400); }
+  else if(prevSel&&DATA.byId.has(prevSel)) select(prevSel,false); else if(prevSel) select(null);
+  loading=false; }
+setInterval(()=>{ if(state.auto&&state.source!=='baked'&&!new URLSearchParams(location.search).get('src')) load(false); }, 60_000);
+
+// ===== tick =========================================================================================
+const clock=new THREE.Clock();
+function tick(){ requestAnimationFrame(tick); const dt=clock.getDelta(), t=clock.elapsedTime;
+  if(state.drift&&!flight&&(state.fold<0.5||state.fold>1.5)) world.rotation.y += dt*0.06*(state.fold<1 ? 1-ease(fChain()) : ease(fStar()));   // the globe and the star both turn; the chain lies flat
+  if(state.fold>=0.5&&state.fold<=1.5) world.rotation.y += (0-world.rotation.y)*Math.min(1,dt*4);
+  if(!REDUCED) for(const s of OBJ.nodes){ const n=s.userData.node; if(n.status==='Serving'&&n.throughput>0) s.scale.setScalar(s.userData.base*(1+0.10*Math.sin(t*2.2+hash01(n.id)*TAU))); }
+  if(!REDUCED&&OBJ.sel&&OBJ.sel.visible){ const s=objOf(state.selected); if(s) OBJ.sel.scale.setScalar(s.userData.base*(1.9+0.25*Math.sin(t*3))); }
+  for(const m of OBJ.boots){ m.rotation.y=t*0.6; m.rotation.x=0.4*Math.sin(t*0.5); }
+  KEY.cores.forEach((L,i)=>{ L.rotation.y = (i?-1:1)*t*0.22; L.rotation.x = 0.15*Math.sin(t*0.4+i); });   // the two cores turn against each other
+  runnerTick(dt); flightTick(dt); pick(); controls.update(); renderer.render(scene,camera); }
+function resize(){ renderer.setSize(innerWidth,innerHeight); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize',resize); resize();
+document.fonts && document.fonts.ready.then(()=>{ if(OBJ.nodes.length) applyPalette(); });
+loadLand(); load(true); tick();
+window.__importKey = importKey;   // for the headless review renderer (tools/shoot.mjs); not a page feature
+</script>
+</body>
+</html>

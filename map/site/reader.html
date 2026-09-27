@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To the VPK working group</title>
+<meta name="description" content="What was built on the KwaaiNet map, and why each connection was made: the seam, the lattice reading, the key, the observer, the boundary key — read against the working group's three aims.">
+<link rel="icon" type="image/png" href="assets/kwaai-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,400&family=Spline+Sans+Mono:wght@300;400;500&display=swap');
+  :root{ --ink:#e8edff; --dim:#9aa3c9; --line:rgba(120,140,220,0.16); --glass:rgba(10,13,28,0.62); --sword:#e8523a; --mage:#4dd9e8; --gold:#E0A526; --teal:#7fe8d8; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Spline Sans Mono',monospace; color:var(--ink); line-height:1.7; font-size:13px; min-height:100vh;
+    background:radial-gradient(120% 90% at 28% 14%, rgba(59,130,246,0.12), transparent 55%), radial-gradient(110% 80% at 80% 88%, rgba(16,185,129,0.07), transparent 55%), radial-gradient(140% 140% at 50% 50%, #0B0E14 0%, #060810 60%, #020308 100%); }
+  a{ color:#9fc0ff; text-decoration:none; } a:hover{ text-decoration:underline; }
+  .wrap{ display:grid; grid-template-columns:220px minmax(0,1fr); gap:40px; max-width:1180px; margin:0 auto; padding:34px 28px 70px; }
+  nav.side{ position:sticky; top:24px; align-self:start; font-size:10.5px; line-height:1.9; }
+  nav.side .eyebrow{ font-size:9px; letter-spacing:0.28em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; }
+  nav.side a{ display:block; color:var(--dim); } nav.side a:hover{ color:var(--ink); text-decoration:none; } nav.side a b{ color:var(--teal); font-weight:500; margin-right:6px; }
+  nav.side .doors{ margin-top:16px; padding-top:12px; border-top:1px solid var(--line); }
+  header .eyebrow{ font-size:10px; letter-spacing:0.32em; text-transform:uppercase; color:var(--dim); display:flex; align-items:center; gap:10px; margin-bottom:12px; } header img{ height:18px; opacity:0.85; }
+  h1{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:clamp(34px,4.6vw,54px); line-height:1.08; background:linear-gradient(100deg,#9fc0ff,#e8edff 44%,#7fe8d8); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:14px; }
+  .lede{ max-width:66ch; color:#c7cfee; font-size:13.5px; margin-bottom:10px; }
+  .tiers{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 6px; font-size:9px; letter-spacing:0.12em; } .tiers span{ padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--dim); } .tiers b{ color:#ffd27a; font-weight:500; }
+  section{ padding:34px 0; border-bottom:1px solid var(--line); }
+  .lab{ font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--dim); margin-bottom:6px; } .lab span{ color:var(--teal); font-family:'Fraunces',serif; font-style:italic; font-size:16px; letter-spacing:0; text-transform:none; margin-right:8px; }
+  h2{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:27px; line-height:1.2; margin-bottom:12px; }
+  h3{ font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--teal); font-weight:500; margin:18px 0 6px; }
+  p{ margin-bottom:10px; max-width:74ch; color:#c7cfee; } b{ color:var(--ink); font-weight:500; } code{ font-size:11.5px; color:#cfe0ff; }
+  ul,ol{ padding-left:18px; margin-bottom:10px; max-width:74ch; color:#c7cfee; } li{ margin-bottom:5px; }
+  .claim{ font-size:9px; letter-spacing:0.1em; color:#ffd27a; }
+  figure{ margin:14px 0 18px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--glass); }
+  figure img{ display:block; width:100%; height:auto; } figcaption{ padding:8px 12px; font-size:10px; color:var(--dim); line-height:1.5; } figcaption b{ color:var(--ink); }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:14px; } .two figure{ margin:0; }
+  table{ width:100%; border-collapse:collapse; font-size:11px; margin:8px 0 16px; } th,td{ text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:top; color:#c7cfee; } th{ color:var(--dim); font-weight:500; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; }
+  td.c{ color:var(--ink); white-space:nowrap; } td .t{ display:inline-block; margin-top:3px; }
+  blockquote{ border-left:2px solid rgba(127,232,216,0.4); padding:2px 0 2px 14px; margin:10px 0 14px; color:#c7cfee; max-width:70ch; } blockquote i{ color:var(--dim); font-style:normal; font-size:10.5px; display:block; margin-top:4px; }
+  pre{ background:rgba(8,10,22,0.7); border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-size:11px; color:#cfe0ff; overflow:auto; margin:8px 0 12px; }
+  .sig{ margin-top:30px; font-size:10px; color:var(--dim); letter-spacing:0.06em; }
+  @media (max-width:860px){ .wrap{ grid-template-columns:1fr; gap:14px; padding:22px 16px 50px } nav.side{ position:static } .two{ grid-template-columns:1fr } }
+  @media print{ body{ background:#fff; color:#111 } nav.side{ display:none } .wrap{ grid-template-columns:1fr } p,li,td,figcaption,blockquote,.lede{ color:#222 } h1,h2{ color:#111; -webkit-text-fill-color:#111 } figure{ break-inside:avoid } }
+</style>
+</head>
+<body><div class="wrap">
+<nav class="side">
+  <div class="eyebrow">the reader</div>
+  <a href="#address"><b>00</b>address</a><a href="#aims"><b>01</b>what the WG asked</a><a href="#built"><b>02</b>what was built</a><a href="#why"><b>03</b>why each connection</a><a href="#offering"><b>04</b>the offering</a><a href="#not"><b>05</b>what it is not</a><a href="#verify"><b>06</b>verify it yourself</a>
+  <div class="doors"><a href="./">the map →</a><a href="guide.html">the guide →</a><a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai_mage →</a></div>
+</nav>
+<main>
+<header>
+  <div class="eyebrow"><img src="assets/kwaai-logo.png" alt="Kwaai"> vpk_kwaai_mage · the map lane · to the VPK working group</div>
+  <h1>What was built on the map, and why the connections were made</h1>
+  <p class="lede">The KwaaiNet map was rebuilt as an instrument that reads the network's own public document and lays a sovereignty lattice over it. This reader says what each part is, which of the working group's stated aims it touches, and why each connection was made rather than another. It is written to be checked, not believed.</p>
+  <div class="tiers"><span><b>VERIFIED</b> read in cited source</span><span><b>OBSERVED</b> seen on a wire or a render</span><span><b>MEASURED</b> from the live crawl of 2026-09-27</span><span><b>THESIS</b> a construction on the canon, offered to be argued with</span><span><b>OPEN</b> not settled here</span></div>
+</header>
+
+<section id="address"><div class="lab"><span>00</span>address</div>
+  <h2>From the sibling lane, converging.</h2>
+  <p>This is the second outward act of the <a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai lane</a>, whose first act named the inference seam and offered a disclosure ladder for it. The posture is the same as that lane's <code>ADDRESS.md</code>: a participant converging, not a stranger arriving; offered, not pushed; every claim tiered and every finding carrying its command. Nothing here asks Kwaai to change a protocol. It asks for review.</p>
+  <p>The whole thing runs locally against <code>https://map.kwaai.ai/api/v1/state</code> and is not deployed anywhere. It lives in this repository as the <code>map/</code> lane, on the branch <code>map-constellation</code> until it is merged; the first lane is untouched.</p>
+</section>
+
+<section id="aims"><div class="lab"><span>01</span>what the working group asked</div>
+  <h2>Three aims, one open condition.</h2>
+  <p>The VPK whitepaper states its research programme as three aims, and one condition on its own guarantee. The connections below are made against these, in these words.</p>
+  <blockquote><b>Aim 1 — VPK PHE Compliance Specification.</b> Define the formal criteria any PHE implementation must satisfy at each compliance tier; reduce the reference implementations' security arguments to hardness assumptions or identify the attacks that constrain them; publish the specification as an open standard.<i>whitepaper, research programme</i></blockquote>
+  <blockquote><b>Aim 2 — Scale Validation.</b> Extend VPKbench to 10M vectors; characterise HNSW recall on encrypted corpora; benchmark multi-shard deployment across WAN on KwaaiNet.<i>untouched by this work</i></blockquote>
+  <blockquote><b>Aim 3 — Oversight Validity and Standardization.</b> Charter sMCP under ToIP; validate EigenTrust-based trust propagation as a mechanism to extend human-anchored oversight across a distributed network of credentialed nodes, contributing to the LF Decentralized Trust Graph WG; demonstrate that an sMCP audit trail provides sufficient oversight signal.<i>whitepaper, research programme</i></blockquote>
+  <blockquote><b>The condition.</b> sMCP's guarantee holds "for deployments where Alice's AI model runs locally or in a trusted enclave."<i>the sentence the first lane was aimed at; on a heterogeneous mesh it does not hold</i></blockquote>
+</section>
+
+<section id="built"><div class="lab"><span>02</span>what was built</div>
+  <h2>One document, three seatings, a card, a lens, a lattice, a key, an observer.</h2>
+  <h3>the document</h3>
+  <p>Everything on the page comes from <code>GET /api/v1/state</code> — the document every node's health monitor polls and <code>kwaai-cli</code> reads to choose a model. Every peer the crawler identified over kad or found named in a DHT record, the per-model server rows, the top contributors, the bootstrap states. No new surface was added to the network; the map reads what it already publishes. The deployed page's own rules for state and reach are kept verbatim so the two never disagree about what a peer is. <span class="claim">VERIFIED · snapshot.rs · kwaainet.html</span></p>
+  <h3>three seatings on one dial</h3>
+  <div class="two">
+    <figure><img src="reader/01-globe.png" alt="the globe seating"><figcaption><b>globe</b> — geoip pins, unplaced peers on an outer ring, bootstraps at the relays' pins, the model's blocks ringing the globe by coverage.</figcaption></figure>
+    <figure><img src="reader/02-chain.png" alt="the chain seating"><figcaption><b>chain</b> — the block axis of the largest model; each peer's announced range as a bar; teal threads where one range can follow another in an inference chain.</figcaption></figure>
+  </div>
+  <figure><img src="reader/03-star.png" alt="the star seating"><figcaption><b>star</b> — the 64 vertices of the sovereignty lattice in three dimensions, placed as the Swordsman's Key places them, with the 96-edge boundary over them; each peer at its vertex. Nothing is re-derived when the dial moves; only the seating changes.</figcaption></figure>
+  <h3>the card</h3>
+  <figure><img src="reader/04-node-card.png" alt="the node card"><figcaption><b>every field the contract carries</b>, with its source: identity, serving, reach (the map-server's verdict against the node's self-report, and the known ways they disagree), the lattice group (vertex, bits, stratum, operator partners, one-flip neighbours, chain moves, betweenness), the platform read from the name, trust, the seam, storage, record. A live reachability probe through the map-server's own endpoint.</figcaption></figure>
+  <h3>the seam lens</h3>
+  <figure><img src="reader/05-seam-lens.png" alt="the seam lens"><figcaption><b>colour by seam</b> — sword-red for the peer serving block 0, which receives every routed prompt as raw token IDs; mage-teal for the peers after it, which receive hidden states; a gold ring for a storage host, which today holds embeddings in the clear.</figcaption></figure>
+  <h3>the lattice reading and the model</h3>
+  <figure><img src="reader/06-model.png" alt="the model tab"><figcaption><b>six yes/no readings</b> of the contract give each peer a vertex; the model then runs untouched: operators, named moves, T(π), the stratum-weighted network term, betweenness. Live: strata 7 · 6 · 6 · 2 · 1 · 0 · 0, network term 9.545 at k = 1, no peer holding protection.</figcaption></figure>
+  <h3>the key lane and the observer</h3>
+  <div class="two">
+    <figure><img src="reader/07-key-walk.png" alt="a walk and the observer"><figcaption><b>walk</b> peers into a version-1 City Key; the <b>observer</b> runs a light around them and counts each visit into a witness; the coverage bar's <b>recorder</b> writes one row of bits per crawl.</figcaption></figure>
+    <figure><img src="reader/10-key-import-star.png" alt="an imported key on the star"><figcaption><b>an imported key</b> arrives as its own layer: the manifold, the dual cores, the 64 with the boundary, its lit vertices burning; the peers standing on them are ringed.</figcaption></figure>
+  </div>
+  <p>And the <b>boundary key</b>: the whole network as a star key, whose root hashes only which vertices are occupied and which vertex pairs the network realises as edges. Seating, palette, names and highlights stay out of the root.</p>
+</section>
+
+<section id="why"><div class="lab"><span>03</span>why each connection was made</div>
+  <h2>Each one is answerable to an aim, a finding, or a canon.</h2>
+  <table>
+    <tr><th>connection</th><th>why this, and not another</th><th>answers to</th></tr>
+    <tr><td class="c">the map reads <code>/api/v1/state</code><br><span class="t claim">VERIFIED</span></td><td>It is the one document the fleet already agrees on. Reading anything else would make the map a second opinion about what a peer is. The v1 page's state and reach rules are copied verbatim for the same reason.</td><td>the honesty the first lane promised: checkable against <code>main</code>, no invented surface</td></tr>
+    <tr><td class="c">the seam lens<br><span class="t claim">F1 OBSERVED · F3 · F4 VERIFIED</span></td><td>Aim 1 needs its residuals named. The largest residual on the inference side is the first block server, which sees the whole prompt. The lens makes that peer visible on the network's own map, every minute, instead of in a finding someone has to go and read. F4 rides along because a storage host is the other place plaintext rests.</td><td>Aim 1 (the residual); the condition on sMCP's guarantee</td></tr>
+    <tr><td class="c">the tier shown, and caveated<br><span class="t claim">F3 VERIFIED</span></td><td>The tier bands the attestations a peer announces. It is shown because it is in the document, and caveated because chain selection sorts on a behaviour score and gates on nothing: the credential ladder never touches which peer serves you. A map that showed tiers without saying that would be a brochure.</td><td>Aim 3: a credentialed network needs the credential ladder to be load-bearing before propagation over it means anything</td></tr>
+    <tr><td class="c">the lattice reading<br><span class="t claim">THESIS</span></td><td>Six rules, one per axis, each reading a different field so no two bits are set by one fact. They turn a peer into a vertex on the same lattice the City's instruments stand on. They are written on the wall so they can be argued with one at a time; change one and the peers move and the κ changes.</td><td>the Privacy Is Value model's own axes (A1); the first time it has been laid over a live network</td></tr>
+    <tr><td class="c">the model's machinery<br><span class="t claim">CANON in form · weights OPEN</span></td><td>Once a vertex exists nothing further is asserted. Operators, named moves, T(π), the stratum-weighted network term and betweenness are the model's, and their uncalibrated constants are printed as such on the page. Betweenness was chosen because V5.4 says where the value lives: where the most paths cross — which on a chain graph is a real, computable place.</td><td>the model (A2; edge-value; network-topology; V5.4 §10.2)</td></tr>
+    <tr><td class="c">the boundary key<br><span class="t claim">THESIS from C9</span></td><td>Aim 3 asks whether an audit trail can give oversight signal. The first lane's answer was a ledger renderable by anyone and readable by no one. The boundary key is that idea applied to a whole network: a root that names the network's shape — occupancy and realised edges — and nothing about how you looked at it, so the same crawl reads the same root from any seat, palette or hand. It falls out of the holographic bound rather than being bolted on.</td><td>Aim 3 (oversight without visibility); PATHWAY §4–5; the holographic bound C9</td></tr>
+    <tr><td class="c">the witness and the recorder<br><span class="t claim">records, not proofs</span></td><td>Presence recorded as a count, in the same shape the Star's lattice mints (<code>witness.spent</code> by vertex), and one row of coverage bits per crawl. Both ride in an exported key. They are the raw material a later bilateral receipt could attest — the receipt rule the first lane wrote — and the page says plainly that neither is a proof.</td><td>PATHWAY §4 (the receipt); the lane's discipline of saying what an instrument is for</td></tr>
+    <tr><td class="c">the City Key format and the PNG carrier<br><span class="t claim">CANON A3 · A7</span></td><td>Exported keys use the κ rule and the text-chunk carrier every instrument in the City already reads, so a key made on the map opens in the lattice, the manifold and the sky without translation. Interoperability was already there; the map only had to not invent a new format.</td><td>the soulbis instruments; the Star Key reader</td></tr>
+    <tr><td class="c">the star as a trust picture<br><span class="t claim">THESIS</span></td><td>A key's lit set and a crawl's occupied vertices are subsets of one ring of 64. Laid on the same surface they can be compared for overlap, the way the sky compares two keys. That is a trust presentation that is not a score — and it is what Aim 3's "human-anchored oversight across a distributed network" could look like when the humans hold keys.</td><td>Aim 3; the Star Key</td></tr>
+    <tr><td class="c">the doors<br><span class="t claim">checked 2026-09-27</span></td><td>The map connects to the node's own pages (API, shard, RAG, dashboard, storage console) and to every relevant Kwaai document, each link checked. A map that is also the index of a node's doors is the "view on map" the dashboard plan asks for, from the other side.</td><td>NODE_UI_PLANNING §2; the debugging guide</td></tr>
+  </table>
+</section>
+
+<section id="offering"><div class="lab"><span>04</span>the offering</div>
+  <h2>A new way of assessing a network.</h2>
+  <p>Taken together, per crawl, the lattice reading yields a reproducible dataset: vertex occupancy, the strata, the network term, the named moves on the chain graph, betweenness, and the boundary root. Anyone with the same document can re-derive every number. That is what the Privacy Is Value model becomes when it is laid over a live decentralised trust graph that exists for private knowledge sharing: not a score of its peers, but a reading of its shape on the sovereignty lattice, with every line labelled canon, thesis or open. <span class="claim">MEASURED, this crawl · THESIS, the reading</span></p>
+  <p>Two things it shows about KwaaiNet today, without any instrument having to argue them: nobody holds the high bit, because no attestation has reached the wire, so the top two strata are empty and the network term is bounded by stratum four; and exactly one peer sees every prompt. Both are facts the working group's aims already care about, now visible on the network's own map.</p>
+</section>
+
+<section id="not"><div class="lab"><span>05</span>what it is not</div>
+  <h2>The honest boundary.</h2>
+  <ul>
+    <li><b>Not a measurement.</b> A dashboard is a reading surface. The tier, the seam colouring and the lattice reading render claims so they can be felt; they do not establish them. (The first lane's note 06 §3, kept on purpose.)</li>
+    <li><b>Not a proof.</b> A key is a reading you chose; a witness is a count of attention; a recorded row is one crawl's bits.</li>
+    <li><b>Not calibrated.</b> β, k and the edge weights are display registers. The model itself lists them as open.</li>
+    <li><b>Not an endorsement graph, not history.</b> Neither is in the contract; neither is invented.</li>
+    <li><b>Not refuted yet.</b> The six rules of the reading have not been through the refuter posture. They should be, before the boundary key is shown as more than a sketch. The attack lines are written down in the lane's second chronicle.</li>
+    <li><b>Not a PR.</b> Offered, not pushed. Aim 2 is untouched.</li>
+  </ul>
+</section>
+
+<section id="verify"><div class="lab"><span>06</span>verify it yourself</div>
+  <h2>Run it, read it, re-derive it.</h2>
+<pre>git clone https://github.com/mitchuski/vpk_kwaai_mage && cd vpk_kwaai_mage/map
+node serve.mjs                # http://localhost:8796/  — reads map.kwaai.ai live, baked fallback
+node tools/bake.mjs           # refresh the snapshot
+node tools/shoot.mjs          # headless render of every view + console errors</pre>
+  <ul>
+    <li>The six rules: <code>AXES</code> at the top of <code>site/index.html</code>. The weights: <code>moveOf</code>, <code>walkValue</code>, <code>netTerm</code>.</li>
+    <li>The serious account of the reading, with worked vertices from the live crawl and six attack lines: <code>../chronicles/2026-09-27_how-a-node-is-assigned-to-the-lattice.md</code>.</li>
+    <li>The work to date and what is open: <code>../chronicles/2026-09-27_the-map-as-constellation.md</code>. The concepts for a newcomer: <a href="guide.html">the guide</a>.</li>
+    <li>The first lane, with F1–F9 and their commands: <a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai_mage</a>.</li>
+  </ul>
+  <p class="sig">vpk_kwaai_mage · the map lane · an agentprivacy contribution to KwaaiNet and the VPK working group · (⚔️⊥⿻⊥🧙)😊</p>
+</section>
+</main>
+</div></body></html>

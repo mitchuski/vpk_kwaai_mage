@@ -59,6 +59,7 @@ always.
 | from the VPK working group | this page, then `PATHWAY.md` sections 2, 7 and 8. Section 8 is what the proposal is *not*. |
 | running a node on small hardware | `FINDINGS.md` F8. If you are on a Raspberry Pi 4, install the **musl** build, not the default. |
 | following our own work | `CONNECTIONS.md` and `STAR-CHART.md`. `GLOSSARY.md` translates between the two vocabularies. |
+| reviewing the **map lane** (2026-09-27) | `map/README.md`, then run `node map/serve.mjs` and open the reader at `/reader.html` — what was built on the KwaaiNet map and why each connection was made, against the working group's three aims. |
 
 ## The problem
 
@@ -117,7 +118,8 @@ PHE cannot go. Which of the three carries the weight for a given corpus is the o
 | `GLOSSARY.md` | Both vocabularies, side by side. |
 | `evidence/VERIFY.md` | The commands behind every source claim. Re-runnable, and it ends by naming what is *not* verified. |
 | `LOCAL-POINTERS.md` | Local only — deliberately not in this repository. |
-| `chronicles/` | Working chronicles, verdict-first: the lane opening, the pathway-grants argument, the next-steps run, and run 2. |
+| `chronicles/` | Working chronicles, verdict-first: the lane opening, the pathway-grants argument, the next-steps run, run 2; and from the map lane, *the map as constellation* and *how a node is assigned to the lattice* (2026-09-27). |
+| `map/` | **The map lane** (2026-09-27): the KwaaiNet map rebuilt as a constellation that reads `/api/v1/state`, with the seam lens, the lattice reading, the key lane, the observer and the boundary key. `map/README.md` is its own front page; `map/site/guide.html` explains it; `map/site/reader.html` addresses the working group. See *What builds on what* below. |
 | `LICENSE.md` | CC BY 4.0 for the documents, MIT for the code, and what neither covers. |
 
 ## How claims are labelled
@@ -156,6 +158,50 @@ Stated plainly, because the two load-bearing claims are both still open:
   inference mesh, and the tailnet case is the easy case. The runtime that enforces the ladder
   (`~/vpk`, a sibling lane) is not yet published; the reproduce commands in `MEASUREMENTS.md`
   reference it for the record.
+
+## What builds on what
+
+Two lanes, one repository. The first is the root of this repository; the second branches from it
+and from four things outside it. Nothing in the first lane was changed to make the second.
+
+```
+vpk_kwaai_mage
+│
+├── the disclosure lane (2026-08-20 · published 2026-08-24)            the root
+│   FINDINGS (F1–F9) · OBSERVATION (G0) · PATHWAY (ladder · gate · receipt · G0–G6)
+│   MEASUREMENTS (runs 1–2) · CONVERGENCE (R(t) · multiplicative gating) · STAR-CHART · notes/01–06
+│   chronicles/2026-08-20_* · 2026-08-24_*
+│
+└── map/ — the map lane (2026-09-27)                                    branches from the root, and from:
+    │   builds on FINDINGS F1 · F3 · F4  → the seam lens, the tier caveat
+    │   builds on PATHWAY §4–5 (the receipt) → the witness, the recorder, the boundary key
+    │   builds on STAR-CHART.md → the lattice reading replaces "strands" with a vertex per peer
+    │   builds on CONVERGENCE.md (the PIV model) → T(π), the network term, betweenness on the live network
+    │
+    │   outside this repository:
+    │   Kwaai-AI-Lab/KwaaiNetMap   the /api/v1/state contract and the v1 page's state + reach rules (kept verbatim)
+    │   guide.agentprivacy.ai/star-chart   the instrument furniture (fold · chips · keepsake) and the vendored three.js
+    │   soulbis /star · /lattice   the 3D lattice geometry, ∂M's 96 edges, the witness shape, the PNG key carrier
+    │   game42 AXIOMS A1–A7        bit values, operators, the κ rule, the carrier palette
+    │   the PIV skills             dragon · edge-value · network-topology · holographic-bound
+    │
+    ├── site/index.html    the instrument (globe ⇄ chain ⇄ star)
+    ├── site/guide.html    the concepts, for a newcomer                 ← leaf of index.html
+    ├── site/reader.html   to the VPK working group                    ← leaf of index.html + the root docs
+    ├── chronicles/2026-09-27_the-map-as-constellation.md              the work and the ideas
+    └── chronicles/2026-09-27_how-a-node-is-assigned-to-the-lattice.md the serious account of the reading
+```
+
+| part | kind | branches from | status |
+|---|---|---|---|
+| the disclosure lane (root) | proposal + measurements | — | published 2026-08-24; nothing posted upstream yet |
+| `map/` | instrument + reading | the root's F1/F3/F4, PATHWAY §4–5, STAR-CHART, CONVERGENCE; KwaaiNetMap; the star instruments; the axioms; the PIV skills | built 2026-09-27; local only; on branch `map-constellation` until merged |
+| the six rules of the lattice reading | THESIS | A1's bit values; the contract's fields | not yet through the refuter posture |
+| the boundary key | THESIS from the holographic bound (C9) | PATHWAY's receipt; `/lattice`'s key format | a sketch until the rules are refuted |
+| Tome XI — *The Constellation* | narrative | the map lane | proposed, unbound, in the City of Mages repository, not here |
+
+What the map lane does **not** change: no finding is edited, no measurement is re-run, no gate of
+`PATHWAY.md` is claimed passed. It reads the same wire the first lane read and draws it.
 
 ## Parallel work
 

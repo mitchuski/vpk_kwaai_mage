@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading the KwaaiNet map</title>
+<meta name="description" content="How to read the KwaaiNet constellation: what it reads, the three seatings, the node card, the seam, the lattice reading, the key, and the doors to the rest of the network.">
+<link rel="icon" type="image/png" href="assets/kwaai-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,400&family=Spline+Sans+Mono:wght@300;400;500&display=swap');
+  :root{ --ink:#e8edff; --dim:#9aa3c9; --line:rgba(120,140,220,0.16); --glass:rgba(10,13,28,0.62); --sword:#e8523a; --mage:#4dd9e8; --gold:#E0A526; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Spline Sans Mono',monospace; color:var(--ink); line-height:1.7; font-size:13px;
+    background:radial-gradient(120% 90% at 28% 14%, rgba(59,130,246,0.12), transparent 55%), radial-gradient(110% 80% at 80% 88%, rgba(16,185,129,0.07), transparent 55%), radial-gradient(140% 140% at 50% 50%, #0B0E14 0%, #060810 60%, #020308 100%); min-height:100vh; }
+  a{ color:#9fc0ff; text-decoration:none; } a:hover{ text-decoration:underline; }
+  .page{ max-width:980px; margin:0 auto; padding:34px 28px 60px; }
+  .eyebrow{ font-size:10px; letter-spacing:0.32em; text-transform:uppercase; color:var(--dim); display:flex; align-items:center; gap:10px; margin-bottom:12px; } .eyebrow img{ height:18px; opacity:0.85; }
+  h1{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:clamp(34px,5vw,56px); line-height:1.08; background:linear-gradient(100deg,#9fc0ff,#e8edff 44%,#7fe8d8); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:14px; }
+  .lede{ max-width:64ch; color:#c7cfee; font-size:13.5px; margin-bottom:22px; }
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; }
+  .btn{ display:inline-block; padding:9px 14px; border-radius:9px; border:1px solid var(--line); background:var(--glass); color:var(--ink); font-size:11px; letter-spacing:0.06em; } .btn.p{ color:#04050b; background:linear-gradient(120deg,#9fc0ff,#7fe8d8); border-color:transparent; }
+  nav.contents{ display:flex; flex-wrap:wrap; gap:8px 18px; padding:14px 0; border-block:1px solid var(--line); font-size:11px; margin-bottom:8px; }
+  section{ display:grid; grid-template-columns:150px minmax(0,1fr); gap:28px; padding:30px 0; border-bottom:1px solid var(--line); }
+  .lab{ font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--dim); padding-top:8px; } .lab span{ display:block; font-size:22px; font-family:'Fraunces',serif; font-style:italic; color:#7fe8d8; letter-spacing:0; text-transform:none; margin-bottom:4px; }
+  h2{ font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:26px; line-height:1.2; margin-bottom:12px; }
+  p{ margin-bottom:10px; max-width:70ch; color:#c7cfee; } b{ color:var(--ink); font-weight:500; } code{ font-size:11.5px; color:#cfe0ff; }
+  ul{ padding-left:18px; margin-bottom:10px; max-width:70ch; color:#c7cfee; } li{ margin-bottom:5px; }
+  table{ width:100%; border-collapse:collapse; font-size:11.5px; margin:8px 0 14px; } td,th{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; color:#c7cfee; } th{ color:var(--dim); font-weight:500; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; }
+  .claim{ font-size:9px; letter-spacing:0.1em; color:#ffd27a; } .st{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#3a4160; } .st.ok{ background:#10B981; box-shadow:0 0 6px #10B981; } .st.no{ background:#EF4444; } .st.q{ background:#F59E0B; }
+  .sw{ display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:middle; margin-right:4px; }
+  footer{ padding:26px 0 0; font-size:10px; color:var(--dim); letter-spacing:0.06em; }
+  @media (max-width:720px){ section{ grid-template-columns:1fr; gap:10px; padding:22px 0 } .page{ padding:22px 16px 40px } }
+</style>
+</head>
+<body><div class="page">
+  <div class="eyebrow"><img src="assets/kwaai-logo.png" alt="Kwaai"> map.kwaai.ai · the guide</div>
+  <h1>Reading the KwaaiNet map</h1>
+  <p class="lede">The constellation shows every peer the map's crawler can see, three ways: where it is, what it serves, and where it sits on the sovereignty lattice. Everything on it comes from one public document. This page says what each part means, what it does not claim, and where the doors lead.</p>
+  <div class="actions"><a class="btn p" href="./">open the map →</a><a class="btn" href="#peer">reading a peer</a><a class="btn" href="#key">the key</a><a class="btn" href="#doors">doors</a></div>
+  <nav class="contents"><a href="#reads">01 what it reads</a><a href="#seatings">02 three seatings</a><a href="#peer">03 a peer</a><a href="#seam">04 the seam</a><a href="#model">05 the lattice reading</a><a href="#key">06 the key</a><a href="#observe">07 observing</a><a href="#doors">08 doors</a><a href="#boundary">09 96 over 64</a><a href="#trust">10 the star as a trust picture</a><a href="#not">11 what it is not</a></nav>
+
+  <section id="reads"><div class="lab"><span>01</span>one document</div><div>
+    <h2>What it reads.</h2>
+    <p><code>GET /api/v1/state</code>: the same document every node's health monitor polls and <code>kwaai-cli</code> reads to choose a model. It carries every peer the observer identified over kad or found named in a DHT record, the per-model server rows, the top contributors and the bootstrap states. Nothing else is read, so nothing else is drawn.</p>
+    <p>Served locally, the page reads the seam live through a proxy and refreshes every <b>60 s</b>, the crawl period. If the seam does not answer, the baked snapshot is shown and the status line says <b>baked</b>. <code>?src=data/some.json</code> reviews any saved document; <code>?node=&lt;peer id&gt;</code> opens on one peer.</p>
+  </div></section>
+
+  <section id="seatings"><div class="lab"><span>02</span>one dial</div><div>
+    <h2>Three seatings: globe, chain, star.</h2>
+    <p><b>Globe.</b> A placed peer sits where geoip put it, lifted a little by throughput. A peer with no location orbits the outer ring rather than vanishing. Bootstraps are octahedra at the relay's own pin, derived from the circuit addresses. The model's blocks ring the globe, coloured by coverage.</p>
+    <p><b>Chain.</b> Every peer lies on the block axis of the largest model: its bar is the range it announces, lanes stack so overlaps read, peers with no range sit on the top row. Chain threads join two serving peers whose ranges let one follow the other in an inference chain.</p>
+    <p><b>Star.</b> The 64 vertices of the sovereignty lattice in three dimensions, placed exactly as the Swordsman's Key places them: six icosahedral directions, one per axis, and each vertex the sum of its held directions. The holographic boundary ∂M is drawn over them as the succ cycle plus the 32 half-turn chords, 96 edges. Each peer sits at its vertex; peers sharing a vertex step outward from it. The blocks ring the equator. It turns, and you can orbit it. Hover a vertex for its bits, its stratum and the peers standing there.</p>
+    <p><b>Where a peer sits on the star.</b> Its vertex x is the six readings of section 05, OR-ed into six bits. The Swordsman's Key gives each bit a direction in space: six unit vectors along icosahedral axes, one per dimension — value, computation, connection, memory, delegation, protection in bit order. The position is the sum over the six bits of (bit − ½) times its direction, scaled so the farthest vertex sits at the star's radius: a held dimension pushes the point half a step along its axis, an unheld one pulls it half a step back. So V0 and V63 are antipodes; the Mage's antipode <code>bnot</code> is the point reflection through the centre; two vertices one flip apart are one fixed step apart along that axis; and the more dimensions a peer holds, the nearer it stands to V63's pole, which is what the stratum colouring shows. The boundary's 96 edges are drawn between those points. Peers sharing a vertex step outward from it in turn, the first at the true vertex. The blocks' equator and the bootstraps' poles are display conventions, not lattice facts. The embedding itself is one faithful picture of the 6-cube, the one the Star already uses, so a key's lit vertices and the peers' vertices are the same points.</p>
+    <p>The <b>coverage bar</b> at the bottom is one cell per block: green two or more serving, amber one, blue loading only, red a gap. Click a cell to isolate the peers serving it. The − at its corner folds it to one line.</p>
+  </div></section>
+
+  <section id="peer"><div class="lab"><span>03</span>the card</div><div>
+    <h2>Reading a peer.</h2>
+    <p>Click a star for its card. Every row is a field of the contract, and the labels are the deployed page's own rules so the two never disagree.</p>
+    <table><tr><th>row</th><th>from</th><th>read it as</th></tr>
+      <tr><td>state</td><td><code>state</code>, <code>shard_loading</code></td><td>online → Serving · joining + loading → Loading · joining → Idle · offline → Departed · unannounced → reached over kad with no DHT record</td></tr>
+      <tr><td>reach</td><td><code>reachability</code>, else the multiaddrs</td><td>Direct · NAT (hole-punched, reachable to a DCUtR dialer, not to anyone) · Relay (only via a bootstrap circuit). The node's own <code>using_relay</code> is config-time intent and can understate NAT; the card says when the two disagree.</td></tr>
+      <tr><td>tier</td><td><code>trust_attestations</code></td><td>banded 0 · 1–2 · 3–4 · 5+ by the v2 design. A reading surface, not evidence.</td></tr>
+      <tr><td>blocks · throughput</td><td><code>span</code>, <code>throughput</code></td><td>the range it announces and its place in a chain: first, mid, last, whole</td></tr>
+      <tr><td>where</td><td><code>location</code></td><td>city, country, ISP, coordinates; or why it could not be placed</td></tr>
+      <tr><td>machine</td><td>the public name</td><td>os / arch / accelerator tokens read from the operator's own label; a reading, not an announcement</td></tr>
+      <tr><td>on the lattice</td><td>the six readings below</td><td>vertex, bits, stratum, the operator partners present, one-flip neighbours, chain moves, betweenness</td></tr>
+      <tr><td>storage</td><td><code>vpk</code></td><td>mode, capacity, tenants; with the note that the store is plaintext at rest today</td></tr>
+      <tr><td>record</td><td><code>last_updated</code></td><td>history is not in the contract, so none is invented</td></tr></table>
+    <p><b>probe reach</b> asks the map-server to dial the peer now (<code>/api/v1/is_reachable/&lt;id&gt;</code>) and shows its answer, <code>{"ok": true}</code> or the failure.</p>
+  </div></section>
+
+  <section id="seam"><div class="lab"><span>04</span>one peer sees the prompt</div><div>
+    <h2>The seam.</h2>
+    <p>A KwaaiNet chain tokenizes the prompt on the coordinator and ships raw token IDs to the first block server, the only peer holding the embedding table. Peers after it receive f16 hidden states. The privacy boundary of a chain is one peer, and that peer sees the whole prompt. <span class="claim">F1 · OBSERVED</span></p>
+    <p>Colour by <b>seam</b>: <span class="sw" style="background:var(--sword)"></span>serving block 0, receives every routed prompt as token IDs · <span class="sw" style="background:var(--mage)"></span>serving later blocks, hidden states · dim, not in the chain. A gold ring marks a VPK Eve host, which today holds embeddings in the clear. <span class="claim">F4 · VERIFIED + REPORTED</span></p>
+    <p>Chain selection in the client sorts on a behaviour score and gates on nothing; the credential ladder never touches peer selection. <span class="claim">F3 · VERIFIED</span> The findings, with their commands, are in <a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai_mage</a>.</p>
+  </div></section>
+
+  <section id="model"><div class="lab"><span>05</span>six readings</div><div>
+    <h2>The lattice reading.</h2>
+    <p>Six yes/no readings of what the contract says about a peer give a 6-bit vertex, V0 to V63, on the sovereignty lattice. Protection is the high bit, value the low bit, the canon's bit values. The rules are a <span class="claim">THESIS</span>, stated so they can be argued with one at a time in the model tab.</p>
+    <table><tr><th>axis</th><th>bit</th><th>the peer is read as holding it when</th></tr>
+      <tr><td>🛡️ protection</td><td>32</td><td>it announces at least one trust attestation</td></tr><tr><td>🤝 delegation</td><td>16</td><td>it is the first block server, holding the delegated prompt</td></tr>
+      <tr><td>📜 memory</td><td>8</td><td>it offers VPK storage</td></tr><tr><td>🔗 connection</td><td>4</td><td>it is named by a DHT record</td></tr>
+      <tr><td>⚡ computation</td><td>2</td><td>it is serving blocks with announced throughput</td></tr><tr><td>💎 value</td><td>1</td><td>it is among the top contributors</td></tr></table>
+    <p>From the vertex the model's own machinery applies. <b>Moves</b> between two peers are named: succ 😊, neg ⚔️ the Swordsman's reflection, bnot 🧙 the Mage's antipode, a single flip, or a jump. A walk's <b>T(π)</b> = 1 + β Σ f(e)·g(nₑ), with f = 0.25·flips + 0.75·|Δstratum| and g = 1/√(times walked), β = 1. The <b>network term</b> (1 + Σ wᵢnᵢ/N₀)^k weights each stratum by Pascal's row, 1 · 6 · 15 · 20 · 15 · 6 · 1, with N₀ the peer count and k on a slider. <b>Betweenness</b> on the chain graph names the peers the most shortest paths cross.</p>
+    <p>All of these are display registers. β, k and the edge weights are uncalibrated by the model's own account; the page shows the numbers so the model can be looked at, not to settle anything.</p>
+  </div></section>
+
+  <section id="key"><div class="lab"><span>06</span>a reading you chose</div><div>
+    <h2>The key.</h2>
+    <p><b>Walk</b> peers with shift+click, or ✦ walk it on a card. The walk is a thread through them and T(π) accumulates. The four <b>palette</b> wells are the City Key carrier palette: cool is the ocean, warm the land and labels, sword the boundary reading, mage the threads. They are kept locally and travel in your key.</p>
+    <p><b>Export</b> writes a version-1 City Key: a name, the palette, the lattice vertices your walked peers sit on as its <code>lit</code> set, the walked peers and moves under <code>source</code>, a witness if you observed, and <b>κ</b>, the SHA-256 of the canonical form with only <code>kappa</code> excluded, so any instrument can re-derive and check it. The <b>keepsake</b> PNG carries the same key in a <code>cityKey</code> text chunk, so it opens in the Star at <a href="https://soulbis.com/lattice" target="_blank" rel="noreferrer">/lattice</a>, <a href="https://soulbis.com/star" target="_blank" rel="noreferrer">/star</a> and <a href="https://soulbis.com/skye" target="_blank" rel="noreferrer">/skye</a>.</p>
+    <p><b>Import</b> a key, JSON or keepsake PNG, and it arrives as its own layer in its own palette: the manifold around the globe, the dual cores at the centre, the 64 inside with ∂M, its lit vertices burning. The globe keeps its colours. Peers standing on a lit vertex are ringed in the key's sword colour; fold to the star to see them on the ring. κ is re-derived and checked on import.</p>
+    <p><b>The whole network as a star key</b> seats every peer at its vertex and lists the edges the network realises on ∂M as vertex pairs. Seating, palette and names stay out of its <code>packets.root</code>, so the same crawl reads the same root on the globe, the chain, the star, or in another instrument: the boundary encodes the bulk. Name your own node in the key tab and it is ringed and named as <code>self</code>.</p>
+    <p>A key is a reading you chose. It is not a credential, not a proof, and not standing in anything.</p>
+  </div></section>
+
+  <section id="observe"><div class="lab"><span>07</span>presence</div><div>
+    <h2>Observing.</h2>
+    <p><b>▶ observe</b> runs a light around your walk, or around the serving chain when nothing is walked, and counts each visit into a <b>witness</b> by vertex, the same shape the Star's lattice mints when a key's focus is walked. <b>● rec</b> on the coverage bar writes one row of bits per crawl, a strip of what the network looked like while you watched. Both ride in an exported key. Both are records of attention that a later ceremony could attest; neither is a proof, and the page says so.</p>
+  </div></section>
+
+  <section id="doors"><div class="lab"><span>08</span>where it connects</div><div>
+    <h2>Doors.</h2>
+    <p>Checked on 2026-09-27. <span class="st ok"></span>answered · <span class="st no"></span>did not · <span class="st q"></span>only on the machine running a node.</p>
+    <table><tr><th>the network</th><th></th></tr>
+      <tr><td><span class="st ok"></span><a href="https://map.kwaai.ai/" target="_blank" rel="noreferrer">map.kwaai.ai</a></td><td>the deployed map</td></tr>
+      <tr><td><span class="st ok"></span><a href="https://map.kwaai.ai/api/v1/state" target="_blank" rel="noreferrer">/api/v1/state</a> · <a href="https://map.kwaai.ai/metrics" target="_blank" rel="noreferrer">/metrics</a> · <a href="https://map.kwaai.ai/api/prometheus" target="_blank" rel="noreferrer">/api/prometheus</a></td><td>the document, and its Prometheus text</td></tr>
+      <tr><td><span class="st ok"></span>/api/v1/is_reachable/&lt;peer&gt;</td><td>a live dial, from the card</td></tr>
+      <tr><th>your node · only when a node runs here</th><th></th></tr>
+      <tr><td><span class="st q"></span>http://localhost:11435/v1/models</td><td>the OpenAI-compatible API of <code>kwaainet start</code></td></tr>
+      <tr><td><span class="st q"></span>http://localhost:8080/</td><td>the shard API, <code>kwaainet shard api</code> (the config's port)</td></tr>
+      <tr><td><span class="st q"></span>http://localhost:9090/</td><td>the RAG server and its embedded web UI, <code>kwaainet rag serve</code></td></tr>
+      <tr><td><span class="st q"></span>http://127.0.0.1:5173/ · http://127.0.0.1:3456/</td><td>the node dashboard, <code>start-ui</code>: status, config, logs, identity, network; backend API on 3456</td></tr>
+      <tr><td><span class="st q"></span>http://127.0.0.1:7432/</td><td>the VPK operator console, local only</td></tr>
+      <tr><td><span class="st q"></span>http://localhost:11434/</td><td>Ollama, a model provider the node can use</td></tr>
+      <tr><th>source · docs</th><th></th></tr>
+      <tr><td><span class="st ok"></span><a href="https://github.com/Kwaai-AI-Lab/KwaaiNet" target="_blank" rel="noreferrer">KwaaiNet</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNetMap" target="_blank" rel="noreferrer">KwaaiNetMap</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNetGUI" target="_blank" rel="noreferrer">KwaaiNetGUI</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNetDashboard" target="_blank" rel="noreferrer">KwaaiNetDashboard</a></td><td>the node and CLI · this map's home · the desktop app · the local web UI</td></tr>
+      <tr><td><span class="st ok"></span><a href="https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/getting-started-node.md" target="_blank" rel="noreferrer">getting started</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/api-quickstart.md" target="_blank" rel="noreferrer">API quickstart</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/DEBUGGING_MAP_VISIBILITY.md" target="_blank" rel="noreferrer">why a node does not appear</a> · <a href="https://github.com/Kwaai-AI-Lab/KwaaiNet/blob/main/docs/NODE_UI_PLANNING.md" target="_blank" rel="noreferrer">dashboard plan</a></td><td>the docs a node operator needs</td></tr>
+      <tr><td><span class="st ok"></span><a href="https://www.kwaai.ai/kwaainet" target="_blank" rel="noreferrer">kwaai.ai/kwaainet</a> · <a href="https://trustoverip.org/" target="_blank" rel="noreferrer">Trust over IP</a> · <a href="https://glianetalliance.org/#pledge" target="_blank" rel="noreferrer">GliaNet pledge</a></td><td>whitepapers · the trust stack · the pledge (its old <code>/pledge</code> path is gone; it is a section of the home page now)</td></tr>
+      <tr><td><span class="st no"></span>KwaaiNetOps</td><td>named in V2.md as the deploy owner; not a public repository, so not linked</td></tr>
+      <tr><th>the star side</th><th></th></tr>
+      <tr><td><span class="st ok"></span><a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">vpk_kwaai_mage</a> · <a href="https://github.com/mitchuski/star-key" target="_blank" rel="noreferrer">star-key</a></td><td>the lane behind the seam · the browser extension and key reader</td></tr>
+      <tr><td><span class="st ok"></span><a href="https://soulbis.com/guide" target="_blank" rel="noreferrer">soulbis /guide</a> · <a href="https://soulbis.com/lattice" target="_blank" rel="noreferrer">/lattice</a> · <a href="https://soulbis.com/star" target="_blank" rel="noreferrer">/star</a> · <a href="https://soulbis.com/skye" target="_blank" rel="noreferrer">/skye</a></td><td>how the key works · the 64 · the manifold · many keys</td></tr>
+      <tr><td><span class="st ok"></span><a href="https://guide.agentprivacy.ai/star-chart/" target="_blank" rel="noreferrer">the guide star chart</a> · <a href="https://mages.city/" target="_blank" rel="noreferrer">mages.city</a></td><td>the instrument this page is built like · the agentland</td></tr></table>
+  </div></section>
+
+  <section id="boundary"><div class="lab"><span>09</span>96 over 64</div><div>
+    <h2>The boundary encodes the bulk.</h2>
+    <p>The lattice has 64 vertices. The Swordsman's Key draws its boundary ∂M with 96 edges: the succ cycle, 64 of them, and the 32 half-turn chords from each vertex to the one across the ring. The model reads the ratio, 96/64 = 1.5, as the holographic principle in discrete form: the surface carries the interior. That is what a zero-knowledge proof does too, and it is why the map's <b>boundary key</b> is built the way it is.</p>
+    <p>The boundary key writes down two things only: which vertices are occupied, with how many peers, and which vertex pairs the network realises as edges, chain threads and one-flip pairs. Its root is the κ of that pair of lists. Seating, palette, names, highlights: none of it is in the root. So a peer on the globe and the same peer on the star are the same vertex, and the same crawl seen by two people in two palettes reads the same root. The network's shape, not its picture, is what the key names.</p>
+    <p>The claim behind this, that value can be computed from boundary observation alone, is the model's C9 and it is a conjecture. The map does not test it. It only takes care that what it hashes is a boundary and nothing else.</p>
+  </div></section>
+
+  <section id="trust"><div class="lab"><span>10</span>the star as a trust picture</div><div>
+    <h2>Every node at its vertex.</h2>
+    <p>Fold to the star and the network is no longer a map of where machines are. It is a picture of what each one holds, on the same 64 vertices a City Key lights. A key's <code>lit</code> set and a crawl's occupied vertices are subsets of one ring, so they can be laid on top of each other: import a key and the peers standing on its lit vertices are ringed in its own sword colour, on the globe and on the ring alike. That is the beginning of a trust presentation: not a score, but a shared surface on which a key and a network can be compared for overlap, the way the Star's sky compares two keys.</p>
+    <p>The vertex a peer sits on is a reading of the contract, six rules that are written down in the model tab and in section 05 and can be argued with one at a time. Change a rule and the peers move; the key you export afterwards carries a different κ, as it should. The reading is the arguable part; the ring, the operators, the strata and the κ rule are the model's own.</p>
+    <p>The working record of how this took shape, and what is still open, is the lane's <a href="https://github.com/mitchuski/vpk_kwaai_mage" target="_blank" rel="noreferrer">sibling lane</a>'s companion chronicle, <code>chronicles/2026-09-27_the-map-as-constellation.md</code> in this repository.</p>
+  </div></section>
+
+  <section id="not"><div class="lab"><span>11</span>the honest boundary</div><div>
+    <h2>What it is not.</h2>
+    <ul><li>Not a measurement. A dashboard is a reading surface; the tier, the seam colouring and the lattice reading render claims so they can be felt, they do not establish them.</li>
+      <li>Not history. The contract carries no first-seen, last-seen or throughput history, so the card says so instead of drawing a sparkline.</li>
+      <li>Not an endorsement graph. No endorsement edges exist in the document yet; none are invented.</li>
+      <li>Not calibrated. β, k and the edge weights are display registers; the model itself lists them as open.</li>
+      <li>Not a proof. A key is a reading you chose; a witness is a count of attention.</li></ul>
+  </div></section>
+  <footer>kwaai · an agentprivacy contribution · reads /api/v1/state · <a href="./">back to the map</a> · (⚔️⊥⿻⊥🧙)😊</footer>
+</div></body></html>
